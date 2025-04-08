@@ -1,0 +1,716 @@
+# Complete Production-Ready Project Structure
+
+## Backend Microservices Structure
+
+```
+holistic-health-os/
+├── .github/
+│   ├── workflows/
+│   │   ├── backend-ci.yml                # Backend CI pipeline
+│   │   ├── frontend-ci.yml               # Frontend CI pipeline
+│   │   ├── infrastructure-ci.yml         # Infrastructure validation
+│   │   ├── security-scanning.yml         # Security scanning workflow
+│   │   └── release.yml                   # Release workflow
+│   ├── CODEOWNERS                        # Code ownership definitions
+│   └── pull_request_template.md          # PR template
+│
+├── docker/
+│   ├── development/
+│   │   ├── docker-compose.yml            # Development environment
+│   │   └── .env.example                  # Example environment variables
+│   ├── production/
+│   │   ├── api-gateway/
+│   │   │   └── Dockerfile                # Production Dockerfile for API Gateway
+│   │   ├── auth-service/
+│   │   │   └── Dockerfile                # Production Dockerfile for Auth Service
+│   │   └── ...                           # Other services
+│   └── monitoring/
+│       ├── prometheus/
+│       │   └── prometheus.yml            # Prometheus configuration
+│       ├── grafana/
+│       │   └── dashboards/
+│       │       ├── system-overview.json  # System dashboard
+│       │       └── service-metrics.json  # Service metrics dashboard
+│       └── docker-compose.monitoring.yml # Monitoring stack
+│
+├── infrastructure/
+│   ├── environments/
+│   │   ├── dev/
+│   │   │   ├── main.tf                   # Dev environment configuration
+│   │   │   ├── variables.tf              # Dev variables
+│   │   │   └── outputs.tf                # Dev outputs
+│   │   ├── staging/
+│   │   │   ├── main.tf                   # Staging environment configuration
+│   │   │   ├── variables.tf              # Staging variables
+│   │   │   └── outputs.tf                # Staging outputs
+│   │   └── production/
+│   │       ├── main.tf                   # Production environment configuration
+│   │       ├── variables.tf              # Production variables
+│   │       └── outputs.tf                # Production outputs
+│   ├── modules/
+│   │   ├── database/
+│   │   │   ├── main.tf                   # Database infrastructure
+│   │   │   ├── variables.tf              # Database variables
+│   │   │   └── outputs.tf                # Database outputs
+│   │   ├── kubernetes/
+│   │   │   ├── main.tf                   # Kubernetes cluster
+│   │   │   ├── variables.tf              # Kubernetes variables
+│   │   │   └── outputs.tf                # Kubernetes outputs
+│   │   ├── networking/
+│   │   │   ├── main.tf                   # Network infrastructure
+│   │   │   ├── variables.tf              # Network variables
+│   │   │   └── outputs.tf                # Network outputs
+│   │   └── security/
+│   │       ├── main.tf                   # Security infrastructure
+│   │       ├── variables.tf              # Security variables
+│   │       └── outputs.tf                # Security outputs
+│   ├── live/
+│   │   ├── global/
+│   │   │   └── s3/
+│   │   │       └── main.tf               # Global resources like S3
+│   │   └── vpc/
+│   │       └── main.tf                   # VPC configuration
+│   ├── main.tf                           # Root Terraform configuration
+│   ├── variables.tf                      # Root variables
+│   └── outputs.tf                        # Root outputs
+│
+├── k8s/
+│   ├── base/
+│   │   ├── api-gateway.yaml              # Base API Gateway deployment
+│   │   ├── auth-service.yaml             # Base Auth Service deployment
+│   │   └── ...                           # Other service deployments
+│   ├── overlays/
+│   │   ├── dev/
+│   │   │   ├── kustomization.yaml        # Dev customization
+│   │   │   └── patches/
+│   │   │       └── replicas-patch.yaml   # Dev-specific patches
+│   │   ├── staging/
+│   │   │   └── kustomization.yaml        # Staging customization
+│   │   └── production/
+│   │       └── kustomization.yaml        # Production customization
+│   └── kustomization.yaml                # Root kustomization
+│
+├── services/
+│   ├── api-gateway/
+│   │   ├── src/
+│   │   │   ├── config/
+│   │   │   │   ├── index.ts              # Configuration exports
+│   │   │   │   ├── app.config.ts         # Application configuration
+│   │   │   │   ├── cors.config.ts        # CORS configuration
+│   │   │   │   ├── rate-limit.config.ts  # Rate limiting configuration
+│   │   │   │   └── swagger.config.ts     # API documentation
+│   │   │   ├── middlewares/
+│   │   │   │   ├── auth.middleware.ts    # Authentication middleware
+│   │   │   │   ├── error.middleware.ts   # Error handling middleware
+│   │   │   │   ├── logging.middleware.ts # Request logging
+│   │   │   │   └── validation.middleware.ts # Request validation
+│   │   │   ├── routes/
+│   │   │   │   ├── index.ts              # Routes registration
+│   │   │   │   ├── auth.routes.ts        # Auth routes
+│   │   │   │   ├── user.routes.ts        # User routes
+│   │   │   │   ├── health.routes.ts      # Health data routes
+│   │   │   │   ├── insights.routes.ts    # Insights routes
+│   │   │   │   └── recommendations.routes.ts # Recommendations routes
+│   │   │   ├── utils/
+│   │   │   │   ├── async-handler.ts      # Async error handling
+│   │   │   │   ├── response.ts           # Response formatting
+│   │   │   │   └── service-proxy.ts      # Service communication
+│   │   │   └── index.ts                  # Application entry point
+│   │   ├── tests/
+│   │   │   ├── routes/
+│   │   │   │   └── health.routes.test.ts # Route tests
+│   │   │   └── middlewares/
+│   │   │       └── auth.middleware.test.ts # Middleware tests
+│   │   ├── Dockerfile                    # Docker build file
+│   │   ├── package.json                  # Dependencies
+│   │   ├── tsconfig.json                 # TypeScript configuration
+│   │   ├── jest.config.js                # Test configuration
+│   │   └── .env.example                  # Environment variables example
+│   │
+│   ├── auth-service/
+│   │   ├── src/
+│   │   │   ├── config/
+│   │   │   │   ├── index.ts              # Configuration exports
+│   │   │   │   ├── app.config.ts         # Application configuration
+│   │   │   │   ├── auth.config.ts        # Auth-specific configuration
+│   │   │   │   └── database.config.ts    # Database configuration
+│   │   │   ├── controllers/
+│   │   │   │   ├── auth.controller.ts    # Authentication controller
+│   │   │   │   └── token.controller.ts   # Token management
+│   │   │   ├── middlewares/
+│   │   │   │   ├── error.middleware.ts   # Error handling
+│   │   │   │   └── validation.middleware.ts # Validation
+│   │   │   ├── models/
+│   │   │   │   ├── user.model.ts         # User database model
+│   │   │   │   └── token.model.ts        # Token database model
+│   │   │   ├── routes/
+│   │   │   │   ├── index.ts              # Routes registration
+│   │   │   │   └── auth.routes.ts        # Auth routes
+│   │   │   ├── services/
+│   │   │   │   ├── auth.service.ts       # Auth business logic
+│   │   │   │   ├── token.service.ts      # Token business logic
+│   │   │   │   └── email.service.ts      # Email communication
+│   │   │   ├── utils/
+│   │   │   │   ├── encryption.ts         # Password handling
+│   │   │   │   ├── jwt.ts                # JWT utilities
+│   │   │   │   └── validation.ts         # Input validation
+│   │   │   └── index.ts                  # Application entry point
+│   │   ├── tests/
+│   │   │   ├── controllers/
+│   │   │   │   └── auth.controller.test.ts # Controller tests
+│   │   │   ├── services/
+│   │   │   │   └── auth.service.test.ts  # Service tests
+│   │   │   └── integration/
+│   │   │       └── auth-flow.test.ts     # Integration tests
+│   │   ├── Dockerfile                    # Docker build file
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   ├── user-service/
+│   │   ├── src/
+│   │   │   ├── config/
+│   │   │   │   ├── index.ts              # Configuration exports
+│   │   │   │   ├── app.config.ts         # Application configuration
+│   │   │   │   └── database.config.ts    # Database configuration
+│   │   │   ├── controllers/
+│   │   │   │   ├── user.controller.ts    # User management
+│   │   │   │   └── profile.controller.ts # Profile management
+│   │   │   ├── middlewares/
+│   │   │   │   ├── auth.middleware.ts    # Auth validation
+│   │   │   │   └── error.middleware.ts   # Error handling
+│   │   │   ├── models/
+│   │   │   │   ├── user.model.ts         # User model
+│   │   │   │   └── profile.model.ts      # Profile model
+│   │   │   ├── routes/
+│   │   │   │   ├── index.ts              # Routes registration
+│   │   │   │   ├── user.routes.ts        # User routes
+│   │   │   │   └── profile.routes.ts     # Profile routes
+│   │   │   ├── services/
+│   │   │   │   ├── user.service.ts       # User business logic
+│   │   │   │   └── profile.service.ts    # Profile business logic
+│   │   │   ├── utils/
+│   │   │   │   ├── validation.ts         # Input validation
+│   │   │   │   └── transform.ts          # Data transformation
+│   │   │   └── index.ts                  # Application entry point
+│   │   ├── tests/
+│   │   │   └── integration/
+│   │   │       └── user-profile.test.ts  # Integration tests
+│   │   ├── Dockerfile                    # Docker build file
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   ├── integration-service/
+│   │   ├── src/
+│   │   │   ├── adapters/
+│   │   │   │   ├── apple-health/
+│   │   │   │   │   ├── client.ts         # API client
+│   │   │   │   │   ├── mapper.ts         # Data mapper
+│   │   │   │   │   └── types.ts          # Type definitions
+│   │   │   │   ├── google-fit/
+│   │   │   │   │   ├── client.ts         # API client
+│   │   │   │   │   ├── mapper.ts         # Data mapper
+│   │   │   │   │   └── types.ts          # Type definitions
+│   │   │   │   ├── fitbit/
+│   │   │   │   │   ├── client.ts         # API client
+│   │   │   │   │   ├── mapper.ts         # Data mapper
+│   │   │   │   │   └── types.ts          # Type definitions
+│   │   │   │   └── garmin/
+│   │   │   │       ├── client.ts         # API client
+│   │   │   │       ├── mapper.ts         # Data mapper
+│   │   │   │       └── types.ts          # Type definitions
+│   │   │   ├── config/
+│   │   │   │   ├── index.ts              # Configuration exports
+│   │   │   │   ├── app.config.ts         # Application configuration
+│   │   │   │   └── integrations.config.ts # Integration configuration
+│   │   │   ├── controllers/
+│   │   │   │   ├── connection.controller.ts # Connection management
+│   │   │   │   └── sync.controller.ts    # Data synchronization
+│   │   │   ├── models/
+│   │   │   │   ├── connection.model.ts   # Connection model
+│   │   │   │   └── health-data.model.ts  # Health data model
+│   │   │   ├── routes/
+│   │   │   │   ├── index.ts              # Routes registration
+│   │   │   │   ├── connection.routes.ts  # Connection routes
+│   │   │   │   └── sync.routes.ts        # Sync routes
+│   │   │   ├── services/
+│   │   │   │   ├── connection.service.ts # Connection business logic
+│   │   │   │   ├── sync.service.ts       # Sync business logic
+│   │   │   │   └── data-transform.service.ts # Data transformation
+│   │   │   ├── utils/
+│   │   │   │   ├── oauth.ts              # OAuth utilities
+│   │   │   │   └── error-handling.ts     # Error utilities
+│   │   │   └── index.ts                  # Application entry point
+│   │   ├── tests/
+│   │   │   ├── adapters/
+│   │   │   │   └── apple-health/
+│   │   │   │       └── mapper.test.ts    # Adapter tests
+│   │   │   └── services/
+│   │   │       └── sync.service.test.ts  # Service tests
+│   │   ├── Dockerfile                    # Docker build file
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   ├── analytics-service/
+│   │   ├── src/
+│   │   │   ├── config/
+│   │   │   │   ├── index.ts              # Configuration exports
+│   │   │   │   ├── app.config.ts         # Application configuration
+│   │   │   │   └── database.config.ts    # Database configuration
+│   │   │   ├── controllers/
+│   │   │   │   ├── analytics.controller.ts # Analytics endpoints
+│   │   │   │   └── reports.controller.ts # Report generation
+│   │   │   ├── models/
+│   │   │   │   ├── health-data.model.ts  # Health data model
+│   │   │   │   └── reports.model.ts      # Reports model
+│   │   │   ├── processors/
+│   │   │   │   ├── activity.processor.ts # Activity data processing
+│   │   │   │   ├── sleep.processor.ts    # Sleep data processing
+│   │   │   │   ├── nutrition.processor.ts # Nutrition data processing
+│   │   │   │   └── aggregator.processor.ts # Data aggregation
+│   │   │   ├── routes/
+│   │   │   │   ├── index.ts              # Routes registration
+│   │   │   │   ├── analytics.routes.ts   # Analytics routes
+│   │   │   │   └── reports.routes.ts     # Reports routes
+│   │   │   ├── services/
+│   │   │   │   ├── analytics.service.ts  # Analytics business logic
+│   │   │   │   ├── reports.service.ts    # Reports generation
+│   │   │   │   └── data-access.service.ts # Data access layer
+│   │   │   ├── utils/
+│   │   │   │   ├── statistics.ts         # Statistical functions
+│   │   │   │   └── date-handling.ts      # Date utilities
+│   │   │   └── index.ts                  # Application entry point
+│   │   ├── tests/
+│   │   │   ├── processors/
+│   │   │   │   └── activity.processor.test.ts # Processor tests
+│   │   │   └── services/
+│   │   │       └── analytics.service.test.ts # Service tests
+│   │   ├── Dockerfile                    # Docker build file
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   ├── ai-service/
+│   │   ├── src/
+│   │   │   ├── config/
+│   │   │   │   ├── index.ts              # Configuration exports
+│   │   │   │   ├── app.config.ts         # Application configuration
+│   │   │   │   ├── pinecone.config.ts    # Vector DB configuration
+│   │   │   │   └── database.config.ts    # Database configuration
+│   │   │   ├── controllers/
+│   │   │   │   ├── insights.controller.ts # Insights endpoints
+│   │   │   │   └── recommendations.controller.ts # Recommendation endpoints
+│   │   │   ├── models/
+│   │   │   │   ├── insights.model.ts     # Insights model
+│   │   │   │   ├── recommendations.model.ts # Recommendations model
+│   │   │   │   └── embeddings.model.ts   # Vector embeddings model
+│   │   │   ├── ml/
+│   │   │   │   ├── correlation_detection/
+│   │   │   │   │   ├── detector.py       # Correlation detector
+│   │   │   │   │   └── models.py         # ML models
+│   │   │   │   ├── recommendation_engine/
+│   │   │   │   │   ├── engine.py         # Recommendation logic
+│   │   │   │   │   └── models.py         # ML models
+│   │   │   │   ├── pattern_recognition/
+│   │   │   │   │   ├── recognizer.py     # Pattern recognizer
+│   │   │   │   │   └── models.py         # ML models
+│   │   │   │   └── utils/
+│   │   │   │       ├── preprocessing.py  # Data preprocessing
+│   │   │   │       ├── feature_engineering.py # Feature engineering
+│   │   │   │       └── evaluation.py     # Model evaluation
+│   │   │   ├── routes/
+│   │   │   │   ├── index.ts              # Routes registration
+│   │   │   │   ├── insights.routes.ts    # Insights routes
+│   │   │   │   └── recommendations.routes.ts # Recommendation routes
+│   │   │   ├── services/
+│   │   │   │   ├── insights.service.ts   # Insights business logic
+│   │   │   │   ├── recommendations.service.ts # Recommendations logic
+│   │   │   │   ├── vector.service.ts     # Vector DB interactions
+│   │   │   │   └── ml-bridge.service.ts  # Python ML bridge
+│   │   │   ├── utils/
+│   │   │   │   ├── python-executor.ts    # Python execution
+│   │   │   │   └── data-transform.ts     # Data transformation
+│   │   │   └── index.ts                  # Application entry point
+│   │   ├── notebooks/
+│   │   │   ├── correlation_analysis.ipynb # Analysis notebooks
+│   │   │   ├── feature_importance.ipynb   # Feature importance analysis
+│   │   │   └── model_evaluation.ipynb     # Model evaluation
+│   │   ├── tests/
+│   │   │   ├── ml/
+│   │   │   │   └── correlation_detection/
+│   │   │   │       └── detector.test.py  # ML tests
+│   │   │   └── services/
+│   │   │       └── recommendations.service.test.ts # Service tests
+│   │   ├── Dockerfile                    # Docker build file
+│   │   ├── requirements.txt              # Python dependencies
+│   │   ├── package.json                  # Node dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   └── notification-service/
+│       ├── src/
+│       │   ├── config/
+│       │   │   ├── index.ts              # Configuration exports
+│       │   │   ├── app.config.ts         # Application configuration
+│       │   │   └── notification.config.ts # Notification configuration
+│       │   ├── controllers/
+│       │   │   ├── notification.controller.ts # Notification endpoints
+│       │   │   └── preferences.controller.ts # Preferences management
+│       │   ├── middlewares/
+│       │   │   ├── auth.middleware.ts    # Auth validation
+│       │   │   └── rate-limit.middleware.ts # Rate limiting
+│       │   ├── models/
+│       │   │   ├── notification.model.ts # Notification model
+│       │   │   └── preferences.model.ts  # Preferences model
+│       │   ├── routes/
+│       │   │   ├── index.ts              # Routes registration
+│       │   │   ├── notification.routes.ts # Notification routes
+│       │   │   └── preferences.routes.ts # Preferences routes
+│       │   ├── services/
+│       │   │   ├── notification.service.ts # Notification logic
+│       │   │   ├── push.service.ts       # Push notification logic
+│       │   │   ├── email.service.ts      # Email service
+│       │   │   └── sms.service.ts        # SMS service
+│       │   ├── templates/
+│       │   │   ├── email/
+│       │   │   │   ├── base.template.ts  # Base email template
+│       │   │   │   ├── insight.template.ts # Insight template
+│       │   │   │   └── reminder.template.ts # Reminder template
+│       │   │   └── push/
+│       │   │       ├── insight.template.ts # Push notification template
+│       │   │       └── reminder.template.ts # Reminder template
+│       │   ├── utils/
+│       │   │   ├── template-parser.ts    # Template processing
+│       │   │   └── delivery-tracker.ts   # Delivery tracking
+│       │   └── index.ts                  # Application entry point
+│       ├── tests/
+│       │   ├── services/
+│       │   │   └── notification.service.test.ts # Service tests
+│       │   └── templates/
+│       │       └── email/
+│       │           └── base.template.test.ts # Template tests
+│       ├── Dockerfile                    # Docker build file
+│       ├── package.json                  # Dependencies
+│       └── tsconfig.json                 # TypeScript configuration
+│
+├── shared/
+│   ├── common/
+│   │   ├── src/
+│   │   │   ├── errors/
+│   │   │   │   ├── api-error.ts          # API error classes
+│   │   │   │   ├── business-error.ts     # Business error classes
+│   │   │   │   └── index.ts              # Error exports
+│   │   │   ├── types/
+│   │   │   │   ├── health-data.types.ts  # Health data types
+│   │   │   │   ├── user.types.ts         # User types
+│   │   │   │   └── index.ts              # Type exports
+│   │   │   ├── validators/
+│   │   │   │   ├── health-data.validator.ts # Data validation
+│   │   │   │   ├── user.validator.ts     # User validation
+│   │   │   │   └── index.ts              # Validator exports
+│   │   │   ├── utils/
+│   │   │   │   ├── date.utils.ts         # Date utilities
+│   │   │   │   ├── string.utils.ts       # String utilities
+│   │   │   │   └── index.ts              # Utility exports
+│   │   │   └── index.ts                  # Module exports
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   ├── logger/
+│   │   ├── src/
+│   │   │   ├── logger.ts                 # Logger implementation
+│   │   │   ├── transports.ts             # Log transports
+│   │   │   └── index.ts                  # Module exports
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   └── monitoring/
+│       ├── src/
+│       │   ├── metrics.ts                # Metrics collection
+│       │   ├── tracing.ts                # Distributed tracing
+│       │   └── index.ts                  # Module exports
+│       ├── package.json                  # Dependencies
+│       └── tsconfig.json                 # TypeScript configuration
+│
+├── data-pipelines/
+│   ├── etl/
+│   │   ├── health-data-processor/
+│   │   │   ├── src/
+│   │   │   │   ├── processors/
+│   │   │   │   │   ├── activity.processor.ts # Activity processing
+│   │   │   │   │   ├── sleep.processor.ts # Sleep processing
+│   │   │   │   │   └── nutrition.processor.ts # Nutrition processing
+│   │   │   │   ├── config.ts             # Pipeline configuration
+│   │   │   │   └── index.ts              # Entry point
+│   │   │   ├── package.json              # Dependencies
+│   │   │   └── tsconfig.json             # TypeScript configuration
+│   │   └── data-aggregator/
+│   │       ├── src/
+│   │       │   ├── aggregators/
+│   │       │   │   ├── daily.aggregator.ts # Daily aggregation
+│   │       │   │   └── weekly.aggregator.ts # Weekly aggregation
+│   │       │   ├── config.ts             # Pipeline configuration
+│   │       │   └── index.ts              # Entry point
+│   │       ├── package.json              # Dependencies
+│   │       └── tsconfig.json             # TypeScript configuration
+│   │
+│   ├── vector-processing/
+│   │   ├── src/
+│   │   │   ├── generators/
+│   │   │   │   ├── profile-embedding.generator.ts # Profile embeddings
+│   │   │   │   ├── health-pattern.generator.ts # Health pattern embeddings
+│   │   │   │   └── recommendation.generator.ts # Recommendation embeddings
+│   │   │   ├── config.ts                 # Pipeline configuration
+│   │   │   └── index.ts                  # Entry point
+│   │   ├── package.json                  # Dependencies
+│   │   └── tsconfig.json                 # TypeScript configuration
+│   │
+│   └── batch-jobs/
+│       ├── insight-generator/
+│       │   ├── src/
+│       │   │   ├── generators/
+│       │   │   │   ├── correlation.generator.ts # Correlation insights
+│       │   │   │   ├── pattern.generator.ts # Pattern insights
+│       │   │   │   └── trend.generator.ts # Trend insights
+│       │   │   ├── config.ts             # Pipeline configuration
+│       │   │   └── index.ts              # Entry point
+│       │   ├── package.json              # Dependencies
+│       │   └── tsconfig.json             # TypeScript configuration
+│       └── recommendation-updater/
+│           ├── src/
+│           │   ├── updaters/
+│           │   │   ├── daily.updater.ts  # Daily recommendation updates
+│           │   │   └── user.updater.ts   # User-specific updates
+│           │   ├── config.ts             # Pipeline configuration
+│           │   └── index.ts              # Entry point
+│           ├── package.json              # Dependencies
+│           └── tsconfig.json             # TypeScript configuration
+│
+├── tools/
+│   ├── database/
+│   │   ├── migrations/
+│   │   │   ├── 20250401000000_init.sql   # Initial schema
+│   │   │   ├── 20250401000001_users.sql  # User tables
+│   │   │   └── ...                       # Other migrations
+│   │   └── seeds/
+│   │       ├── dev/
+│   │       │   ├── 01_users.sql          # Development data
+│   │       │   └── ...                   # Other seed data
+│   │       └── test/
+│   │           ├── 01_users.sql          # Test data
+│   │           └── ...                   # Other test data
+│   │
+│   └── scripts/
+│       ├── setup-dev.sh                  # Development setup script
+│       ├── generate-api-docs.js          # API documentation generator
+│       └── deploy.sh                     # Deployment script
+│
+├── docs/
+│   ├── api/
+│   │   ├── auth.md                       # Auth API documentation
+│   │   ├── user.md                       # User API documentation
+│   │   └── ...                           # Other API docs
+│   ├── architecture/
+│   │   ├── overview.md                   # System overview
+│   │   ├── data-model.md                 # Data model documentation
+│   │   └── services.md                   # Service documentation
+│   ├── deployment/
+│   │   ├── kubernetes.md                 # Kubernetes deployment
+│   │   └── monitoring.md                 # Monitoring setup
+│   └── development/
+│       ├── getting-started.md            # Developer onboarding
+│       └── coding-standards.md           # Coding standards
+│
+├── tests/
+│   ├── integration/
+│   │   ├── auth-flow.test.ts             # Authentication flow
+│   │   └── health-data-flow.test.ts      # Health data flow
+│   ├── e2e/
+│   │   ├── user-journey.test.ts          # Complete user journey
+│   │   └── insights-generation.test.ts   # Insights generation flow
+│   ├── performance/
+│   │   ├── load-test.js                  # System load testing
+│   │   └── api-benchmarks.js             # API performance benchmarks
+│   └── security/
+│       ├── penetration-tests.js          # Penetration testing
+│       └── data-privacy.test.js          # Data privacy compliance tests
+│
+├── security/
+│   ├── secrets-management/
+│   │   ├── vault-policies/
+│   │   │   ├── service-policies.hcl      # Service access policies
+│   │   │   └── admin-policies.hcl        # Admin access policies
+│   │   └── key-rotation.js               # Automated key rotation
+│   ├── certificates/
+│   │   ├── cert-manager/
+│   │   │   └── cluster-issuer.yaml       # Certificate issuer config
+│   │   └── renewal-hooks/
+│   │       └── post-renewal.sh           # Post-renewal actions
+│   └── policies/
+│       ├── data-retention-policy.md      # Data retention policy
+│       ├── access-control-policy.md      # Access control policy
+│       └── incident-response-plan.md     # Security incident response
+│
+├── monitoring/
+│   ├── prometheus/
+│   │   ├── rules/
+│   │   │   ├── alert-rules.yaml          # Alert definitions
+│   │   │   └── recording-rules.yaml      # Recording rules
+│   │   └── prometheus.yaml               # Prometheus config
+│   ├── grafana/
+│   │   ├── dashboards/
+│   │   │   ├── system-overview.json      # System overview dashboard
+│   │   │   ├── service-health.json       # Service health dashboard
+│   │   │   └── business-metrics.json     # Business metrics dashboard
+│   │   └── datasources/
+│   │       └── prometheus.yaml           # Prometheus data source
+│   ├── alerting/
+│   │   ├── alert-manager/
+│   │   │   └── config.yaml               # Alert manager configuration
+│   │   └── notification-templates/
+│   │       ├── slack.tmpl                # Slack notification templates
+│   │       └── email.tmpl                # Email notification templates
+│   └── distributed-tracing/
+│       ├── jaeger/
+│       │   └── jaeger.yaml               # Jaeger configuration
+│       └── tempo/
+│           └── tempo.yaml                # Tempo configuration
+│
+├── client/                               # Frontend applications
+│   ├── mobile/                           # React Native Expo app with app folder routing
+│   │   ├── app/                          # App directory routes
+│   │   │   ├── (auth)/                   # Authentication routes group
+│   │   │   │   ├── sign-in.tsx           # Sign in screen
+│   │   │   │   ├── sign-up.tsx           # Sign up screen
+│   │   │   │   ├── forgot-password.tsx   # Password recovery
+│   │   │   │   └── _layout.tsx           # Auth layout
+│   │   │   ├── (tabs)/                   # Main tab navigation
+│   │   │   │   ├── home/                 # Home tab
+│   │   │   │   │   ├── index.tsx         # Home screen
+│   │   │   │   │   └── insights.tsx      # Insights screen
+│   │   │   │   ├── tracker/              # Health tracking tab
+│   │   │   │   │   ├── index.tsx         # Tracker home
+│   │   │   │   │   ├── activity.tsx      # Activity tracking
+│   │   │   │   │   ├── sleep.tsx         # Sleep tracking
+│   │   │   │   │   ├── nutrition.tsx     # Nutrition tracking
+│   │   │   │   │   └── mental.tsx        # Mental state tracking
+│   │   │   │   ├── profile/              # User profile tab
+│   │   │   │   │   ├── index.tsx         # Profile home
+│   │   │   │   │   ├── connections.tsx   # Platform connections
+│   │   │   │   │   ├── goals.tsx         # User goals
+│   │   │   │   │   └── settings.tsx      # App settings
+│   │   │   │   └── _layout.tsx           # Tab layout
+│   │   │   ├── recommendations/
+│   │   │   │   ├── [id].tsx              # Individual recommendation
+│   │   │   │   └── index.tsx             # All recommendations
+│   │   │   ├── insights/
+│   │   │   │   ├── [id].tsx              # Individual insight
+│   │   │   │   └── index.tsx             # All insights
+│   │   │   ├── onboarding/
+│   │   │   │   ├── [step].tsx            # Onboarding steps
+│   │   │   │   └── _layout.tsx           # Onboarding layout
+│   │   │   ├── _layout.tsx               # Root layout
+│   │   │   └── index.tsx                 # Entry screen
+│   │   ├── components/                   # Shared components
+│   │   │   ├── ui/                       # UI components
+│   │   │   │   ├── Button.tsx            # Button component
+│   │   │   │   ├── Card.tsx              # Card component
+│   │   │   │   ├── HealthMetricCard.tsx  # Health metric card
+│   │   │   │   ├── ProgressBar.tsx       # Progress bar
+│   │   │   │   └── Chart.tsx             # Chart component
+│   │   │   ├── insights/                 # Insight components
+│   │   │   │   ├── InsightCard.tsx       # Insight card
+│   │   │   │   └── CorrelationView.tsx   # Correlation visualization
+│   │   │   ├── trackers/                 # Tracker components
+│   │   │   │   ├── ActivityTracker.tsx   # Activity tracker
+│   │   │   │   ├── SleepTracker.tsx      # Sleep tracker
+│   │   │   │   └── NutritionTracker.tsx  # Nutrition tracker
+│   │   │   └── layout/                   # Layout components
+│   │   │       ├── Header.tsx            # Header component
+│   │   │       └── TabBar.tsx            # Custom tab bar
+│   │   ├── hooks/                        # Custom hooks
+│   │   │   ├── useAuth.ts                # Authentication hook
+│   │   │   ├── useHealthData.ts          # Health data hook
+│   │   │   ├── useInsights.ts            # Insights hook
+│   │   │   └── useNotifications.ts       # Notifications hook
+│   │   ├── services/                     # API services
+│   │   │   ├── api.ts                    # API client
+│   │   │   ├── auth.service.ts           # Auth service
+│   │   │   ├── health.service.ts         # Health data service
+│   │   │   ├── insights.service.ts       # Insights service
+│   │   │   └── recommendations.service.ts # Recommendations service
+│   │   ├── utils/                        # Utility functions
+│   │   │   ├── date.ts                   # Date utilities
+│   │   │   ├── storage.ts                # Local storage
+│   │   │   ├── validation.ts             # Form validation
+│   │   │   └── formatting.ts             # Data formatting
+│   │   ├── providers/                    # Context providers
+│   │   │   ├── AuthProvider.tsx          # Auth context
+│   │   │   ├── HealthDataProvider.tsx    # Health data context
+│   │   │   └── ThemeProvider.tsx         # Theme provider
+│   │   ├── theme/                        # Theming
+│   │   │   ├── colors.ts                 # Color definitions
+│   │   │   ├── typography.ts             # Typography styles
+│   │   │   ├── spacing.ts                # Spacing system
+│   │   │   └── index.ts                  # Theme exports
+│   │   ├── types/                        # TypeScript types
+│   │   │   ├── navigation.ts             # Navigation types
+│   │   │   ├── api.ts                    # API response types
+│   │   │   └── health-data.ts            # Health data types
+│   │   ├── assets/                       # Static assets
+│   │   │   ├── images/                   # Images
+│   │   │   ├── icons/                    # Icon assets
+│   │   │   └── fonts/                    # Custom fonts
+│   │   ├── app.json                      # Expo configuration
+│   │   ├── babel.config.js               # Babel configuration
+│   │   ├── tsconfig.json                 # TypeScript configuration
+│   │   ├── package.json                  # Dependencies
+│   │   ├── metro.config.js               # Metro bundler config
+│   │   ├── app.config.ts                 # App configuration
+│   │   ├── eas.json                      # EAS build configuration
+│   │   └── README.md                     # Mobile app documentation
+│   │
+│   ├── web-dashboard/                    # Web dashboard (React)
+│   │   ├── src/
+│   │   │   ├── pages/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   └── services/
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
+│   └── shared/                           # Shared code between web and mobile
+│       ├── src/
+│       │   ├── api/
+│       │   ├── utils/
+│       │   └── types/
+│       ├── package.json
+│       └── tsconfig.json
+│
+├── queue-service/                        # Message queue service
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── queue.config.ts           # Queue configuration
+│   │   ├── producers/
+│   │   │   ├── health-data.producer.ts   # Health data events
+│   │   │   └── notification.producer.ts  # Notification events
+│   │   ├── consumers/
+│   │   │   ├── health-data.consumer.ts   # Health data processing
+│   │   │   └── notification.consumer.ts  # Notification delivery
+│   │   ├── middleware/
+│   │   │   ├── retry.middleware.ts       # Retry logic
+│   │   │   └── validation.middleware.ts  # Message validation
+│   │   └── index.ts                      # Service entry point
+│   ├── Dockerfile                        # Docker build file
+│   ├── package.json                      # Dependencies
+│   └── tsconfig.json                     # TypeScript configuration
+│
+├── package.json                          # Root package.json for monorepo setup
+├── lerna.json                            # Lerna configuration for monorepo
+├── tsconfig.json                         # Base TypeScript configuration
+├── .eslintrc.js                          # ESLint configuration
+├── .prettierrc                           # Prettier configuration
+├── .gitignore                            # Git ignore patterns
+├── .editorconfig                         # Editor configuration
+├── .env.example                          # Example environment variables
+├── README.md                             # Project documentation
+├── CONTRIBUTING.md                       # Contribution guidelines
+├── LICENSE                               # Project license
+└── docker-compose.yml                    # Development environment

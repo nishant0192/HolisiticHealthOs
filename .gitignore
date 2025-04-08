@@ -1,0 +1,29 @@
+# Ignore all node_modules directories
+**/node_modules/
+
+# Ignore log files
+*.log
+
+# Ignore npm-debug.log files
+npm-debug.log*
+
+# Ignore any environment files (optional, depending on your setup)
+.env
+
+# Ignore build output folders (optional, adjust to your project)
+dist/
+build/
+
+# Ignore temporary files (optional)
+*.tmp
+*.swp
+
+# Ignore IDE and editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
