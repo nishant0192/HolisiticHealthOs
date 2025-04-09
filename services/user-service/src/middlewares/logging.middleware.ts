@@ -2,10 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import morgan, { StreamOptions } from 'morgan';
 import winston from 'winston';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { appConfig } from '../config';
 
 // Configure winston logger
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: appConfig.logs.level,
   format: winston.format.combine(
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
@@ -13,7 +15,7 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  defaultMeta: { service: 'api-gateway' },
+  defaultMeta: { service: 'user-service' },
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
@@ -27,8 +29,8 @@ const logger = winston.createLogger({
 });
 
 // Add file transport in production
-if (process.env.NODE_ENV === 'production') {
-  const logDir = process.env.LOG_DIR || 'logs';
+if (appConfig.env === 'production') {
+  const logDir = appConfig.logs.directory;
   
   logger.add(new winston.transports.File({
     filename: path.join(logDir, 'error.log'),
@@ -45,6 +47,14 @@ const stream: StreamOptions = {
   write: (message) => logger.info(message.trim())
 };
 
+// Add request ID
+export const addRequestId = (req: Request, res: Response, next: NextFunction) => {
+  const requestId = uuidv4();
+  req.headers['x-request-id'] = requestId;
+  res.setHeader('X-Request-ID', requestId);
+  next();
+};
+
 // Create a middleware function for HTTP request logging
 export const requestLogger = morgan(
   // Log format
@@ -54,19 +64,20 @@ export const requestLogger = morgan(
 
 // Create a middleware to log request/response bodies in development
 export const detailedLogger = (req: Request, res: Response, next: NextFunction) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (appConfig.env === 'development') {
     const originalSend = res.send;
     
     logger.debug(`Request [${req.method}] ${req.originalUrl}`, {
+      requestId: req.headers['x-request-id'],
       body: req.body,
       params: req.params,
-      query: req.query,
-      headers: req.headers
+      query: req.query
     });
     
     // Override res.send to log response body
     res.send = function (body: any): Response {
       logger.debug(`Response [${req.method}] ${req.originalUrl}`, {
+        requestId: req.headers['x-request-id'],
         statusCode: res.statusCode,
         body: typeof body === 'string' ? body : JSON.stringify(body)
       });
