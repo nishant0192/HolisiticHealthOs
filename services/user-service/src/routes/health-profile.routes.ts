@@ -94,4 +94,56 @@ router.put(
     healthProfileController.updateHealthProfile
 );
 
+/**
+ * @swagger
+ * /health-profile/measurements/latest:
+ *   get:
+ *     summary: Get latest health measurements
+ *     tags: [Health Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Latest measurements retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/measurements/latest', authenticateJwt, healthProfileController.getLatestMeasurements);
+
+/**
+ * @swagger
+ * /health-profile/measurements:
+ *   put:
+ *     summary: Update health measurements
+ *     tags: [Health Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               height:
+ *                 type: number
+ *                 description: User's height value (in cm)
+ *               weight:
+ *                 type: number
+ *                 description: User's weight value (in kg)
+ *     responses:
+ *       200:
+ *         description: Measurements updated successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ */
+router.put(
+    '/measurements',
+    authenticateJwt,
+    // Optionally, you can add a validation middleware for height and weight if you add the schema
+    healthProfileController.updateMeasurements
+);
+
 export default router;
