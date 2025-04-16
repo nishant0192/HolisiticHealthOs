@@ -1,3 +1,4 @@
+// src/services/activity.service.ts
 import { ActivityModel, Activity, CreateActivityParams } from '../models/activity.model';
 import { HealthDataModel, CreateHealthDataParams } from '../models/health-data.model';
 import { ApiError } from '../middlewares/error.middleware';

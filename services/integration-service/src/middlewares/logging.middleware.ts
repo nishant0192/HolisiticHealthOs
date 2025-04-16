@@ -1,3 +1,4 @@
+// src/middlewares/logging.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import morgan, { StreamOptions } from 'morgan';
 import winston from 'winston';

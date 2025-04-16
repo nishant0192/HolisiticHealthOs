@@ -1,3 +1,4 @@
+// src/services/connection.service.ts
 import { ConnectionModel, Connection, CreateConnectionParams, Provider, UpdateConnectionParams } from '../models/connection.model';
 import { ApiError } from '../middlewares/error.middleware';
 import { logger } from '../middlewares/logging.middleware';
@@ -5,6 +6,7 @@ import * as appleHealth from '../adapters/apple-health';
 import * as googleFit from '../adapters/google-fit';
 import * as fitbit from '../adapters/fitbit';
 import * as garmin from '../adapters/garmin';
+import * as oauth from '../utils/oauth';
 
 export class ConnectionService {
     private connectionModel: ConnectionModel;
@@ -77,15 +79,15 @@ export class ConnectionService {
                     throw new ApiError('Apple Health connections must be created via the mobile app', 400);
 
                 case 'google_fit':
-                    tokenData = await googleFit.client.getAccessToken(code);
+                    tokenData = await oauth.exchangeCodeForToken(provider, code);
                     break;
 
                 case 'fitbit':
-                    tokenData = await fitbit.client.getAccessToken(code);
+                    tokenData = await oauth.exchangeCodeForToken(provider, code);
                     break;
 
                 case 'garmin':
-                    tokenData = await garmin.client.getAccessToken(code);
+                    tokenData = await oauth.exchangeCodeForToken(provider, code);
                     break;
 
                 default:
@@ -190,15 +192,15 @@ export class ConnectionService {
                     throw new ApiError('Apple Health tokens must be refreshed via the mobile app', 400);
 
                 case 'google_fit':
-                    tokenData = await googleFit.client.refreshAccessToken(connection.refresh_token);
+                    tokenData = await oauth.refreshAccessToken(connection.provider, connection.refresh_token);
                     break;
 
                 case 'fitbit':
-                    tokenData = await fitbit.client.refreshAccessToken(connection.refresh_token);
+                    tokenData = await oauth.refreshAccessToken(connection.provider, connection.refresh_token);
                     break;
 
                 case 'garmin':
-                    tokenData = await garmin.client.refreshAccessToken(connection.refresh_token);
+                    tokenData = await oauth.refreshAccessToken(connection.provider, connection.refresh_token);
                     break;
 
                 default:

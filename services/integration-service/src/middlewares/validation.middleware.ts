@@ -1,3 +1,4 @@
+// src/middlewares/validation.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { ApiError } from './error.middleware';
@@ -27,11 +28,15 @@ export const integrationValidationSchemas = {
   createConnection: Joi.object({
     provider: Joi.string().required().valid('apple_health', 'google_fit', 'fitbit', 'garmin'),
     code: Joi.string().when('provider', {
-      is: Joi.valid('google_fit', 'fitbit'),
+      is: Joi.valid('google_fit', 'fitbit', 'garmin'),
       then: Joi.required(),
       otherwise: Joi.optional()
     }),
-    access_token: Joi.string().optional(),
+    access_token: Joi.string().when('provider', {
+      is: 'apple_health',
+      then: Joi.required(),
+      otherwise: Joi.optional()
+    }),
     refresh_token: Joi.string().optional(),
     token_expires_at: Joi.date().iso().optional(),
     scopes: Joi.array().items(Joi.string()).optional()

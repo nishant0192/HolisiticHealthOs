@@ -1,3 +1,4 @@
+// src/services/sync.service.ts
 import { ConnectionService } from './connection.service';
 import { ActivityService } from './activity.service';
 import { SleepService } from './sleep.service';
@@ -79,26 +80,42 @@ export class SyncService {
             await this.healthDataModel.deleteByUserAndSource(userId, provider);
 
             // Fetch data from provider and sync to database
-            let activities = [];
-            let sleepData = [];
-            let nutritionData = [];
-            let healthData = [];
+            let activitiesCount = 0;
+            let sleepCount = 0;
+            let nutritionCount = 0;
+            let healthDataCount = 0;
 
             switch (provider) {
                 case 'apple_health':
-                    activities = await this.syncAppleHealthData(connection.access_token, userId, startDate, endDate);
+                    const appleHealthResult = await this.syncAppleHealthData(connection.access_token, userId, startDate, endDate);
+                    activitiesCount = appleHealthResult.activitiesCount;
+                    sleepCount = appleHealthResult.sleepCount;
+                    nutritionCount = appleHealthResult.nutritionCount;
+                    healthDataCount = appleHealthResult.healthDataCount;
                     break;
 
                 case 'google_fit':
-                    activities = await this.syncGoogleFitData(connection.access_token, userId, startDate, endDate);
+                    const googleFitResult = await this.syncGoogleFitData(connection.access_token, userId, startDate, endDate);
+                    activitiesCount = googleFitResult.activitiesCount;
+                    sleepCount = googleFitResult.sleepCount;
+                    nutritionCount = googleFitResult.nutritionCount;
+                    healthDataCount = googleFitResult.healthDataCount;
                     break;
 
                 case 'fitbit':
-                    activities = await this.syncFitbitData(connection.access_token, userId, startDate, endDate);
+                    const fitbitResult = await this.syncFitbitData(connection.access_token, userId, startDate, endDate);
+                    activitiesCount = fitbitResult.activitiesCount;
+                    sleepCount = fitbitResult.sleepCount;
+                    nutritionCount = fitbitResult.nutritionCount;
+                    healthDataCount = fitbitResult.healthDataCount;
                     break;
 
                 case 'garmin':
-                    activities = await this.syncGarminData(connection.access_token, userId, startDate, endDate);
+                    const garminResult = await this.syncGarminData(connection.access_token, userId, startDate, endDate);
+                    activitiesCount = garminResult.activitiesCount;
+                    sleepCount = garminResult.sleepCount;
+                    nutritionCount = garminResult.nutritionCount;
+                    healthDataCount = garminResult.healthDataCount;
                     break;
 
                 default:
@@ -109,10 +126,10 @@ export class SyncService {
             await this.connectionService.updateLastSynced(connection.id);
 
             return {
-                activitiesCount: activities.length,
-                sleepCount: sleepData.length,
-                nutritionCount: nutritionData.length,
-                healthDataCount: healthData.length
+                activitiesCount,
+                sleepCount,
+                nutritionCount,
+                healthDataCount
             };
         } catch (error) {
             if (error instanceof ApiError) {
@@ -132,7 +149,12 @@ export class SyncService {
         userId: string,
         startDate: Date,
         endDate: Date
-    ): Promise<number> {
+    ): Promise<{
+        activitiesCount: number;
+        sleepCount: number;
+        nutritionCount: number;
+        healthDataCount: number;
+    }> {
         try {
             // Fetch data from Apple Health
             const activities = await appleHealth.client.getActivities(accessToken, startDate, endDate);
@@ -151,7 +173,12 @@ export class SyncService {
             const nutritionCount = await this.nutritionService.bulkCreate(mappedNutritionData);
             const healthDataCount = await this.healthDataModel.bulkCreate(mappedHealthData);
 
-            return activityCount + sleepCount + nutritionCount + healthDataCount;
+            return {
+                activitiesCount: activityCount,
+                sleepCount,
+                nutritionCount,
+                healthDataCount
+            };
         } catch (error) {
             logger.error('Error in SyncService.syncAppleHealthData:', error);
             throw error;
@@ -166,7 +193,12 @@ export class SyncService {
         userId: string,
         startDate: Date,
         endDate: Date
-    ): Promise<number> {
+    ): Promise<{
+        activitiesCount: number;
+        sleepCount: number;
+        nutritionCount: number;
+        healthDataCount: number;
+    }> {
         try {
             // Fetch data from Google Fit
             const activities = await googleFit.client.getActivities(accessToken, startDate, endDate);
@@ -185,7 +217,12 @@ export class SyncService {
             const nutritionCount = await this.nutritionService.bulkCreate(mappedNutritionData);
             const healthDataCount = await this.healthDataModel.bulkCreate(mappedHealthData);
 
-            return activityCount + sleepCount + nutritionCount + healthDataCount;
+            return {
+                activitiesCount: activityCount,
+                sleepCount,
+                nutritionCount,
+                healthDataCount
+            };
         } catch (error) {
             logger.error('Error in SyncService.syncGoogleFitData:', error);
             throw error;
@@ -200,12 +237,21 @@ export class SyncService {
         userId: string,
         startDate: Date,
         endDate: Date
-    ): Promise<number> {
+    ): Promise<{
+        activitiesCount: number;
+        sleepCount: number;
+        nutritionCount: number;
+        healthDataCount: number;
+    }> {
         try {
-            // This is a placeholder implementation
-            // In a real implementation, you would follow a similar pattern to the other providers
-
-            return 0;
+            // This would be a full implementation in a real service
+            // For now, we'll just return 0 counts
+            return {
+                activitiesCount: 0,
+                sleepCount: 0,
+                nutritionCount: 0,
+                healthDataCount: 0
+            };
         } catch (error) {
             logger.error('Error in SyncService.syncFitbitData:', error);
             throw error;
@@ -220,12 +266,21 @@ export class SyncService {
         userId: string,
         startDate: Date,
         endDate: Date
-    ): Promise<number> {
+    ): Promise<{
+        activitiesCount: number;
+        sleepCount: number;
+        nutritionCount: number;
+        healthDataCount: number;
+    }> {
         try {
-            // This is a placeholder implementation
-            // In a real implementation, you would follow a similar pattern to the other providers
-
-            return 0;
+            // This would be a full implementation in a real service
+            // For now, we'll just return 0 counts
+            return {
+                activitiesCount: 0,
+                sleepCount: 0,
+                nutritionCount: 0,
+                healthDataCount: 0
+            };
         } catch (error) {
             logger.error('Error in SyncService.syncGarminData:', error);
             throw error;
@@ -295,6 +350,26 @@ export class SyncService {
 
             logger.error('Error in SyncService.syncAllForUser:', error);
             throw new ApiError('Failed to sync data for user', 500);
+        }
+    }
+
+    /**
+     * Get sync status for all connections
+     */
+    async getSyncStatus(userId: string): Promise<any[]> {
+        try {
+            const connections = await this.connectionService.getActiveConnectionsByUser(userId);
+            
+            return connections.map(conn => ({
+                id: conn.id,
+                provider: conn.provider,
+                status: conn.status,
+                last_synced_at: conn.last_synced_at,
+                token_expires_at: conn.token_expires_at
+            }));
+        } catch (error) {
+            logger.error('Error in SyncService.getSyncStatus:', error);
+            throw new ApiError('Failed to get sync status', 500);
         }
     }
 }
