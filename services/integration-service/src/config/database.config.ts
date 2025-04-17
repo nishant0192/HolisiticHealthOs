@@ -1,5 +1,7 @@
 import { Pool, PoolConfig } from 'pg';
-import { logger } from '../middlewares/logging.middleware';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 interface DatabaseConfig {
   host: string;
@@ -13,7 +15,7 @@ interface DatabaseConfig {
   connectionTimeoutMillis: number;
 }
 
-if (!process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_HOST || !process.env.DB_DATABASE) {
+if (!process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_HOST || !process.env.DB_NAME) {
   console.error('FATAL ERROR: Database configuration is not complete. Check environment variables.');
   process.exit(1);
 }
@@ -21,7 +23,7 @@ if (!process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_HOST || 
 const databaseConfig: DatabaseConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432', 10),
-  database: process.env.DB_DATABASE || 'holistic_health_os',
+  database: process.env.DB_NAME || 'holistic_health_os',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   ssl: process.env.DB_SSL === 'true',
@@ -53,10 +55,10 @@ export const pool = new Pool(poolConfig);
 // Test the connection
 pool.query('SELECT NOW()', (err) => {
   if (err) {
-    logger.error('Database connection error:', err.message);
-    process.exit(1);
+    console.error('Database connection error:', err.message);
+    // Don't exit the process here, let it be handled elsewhere
   } else {
-    logger.info('Database connection successful');
+    console.log('Database connection successful');
   }
 });
 
