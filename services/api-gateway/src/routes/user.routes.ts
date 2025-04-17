@@ -21,7 +21,7 @@ const router = Router();
  */
 router.get('/profile', 
   validateToken, 
-  asyncHandler(proxyToService('user', '/users/profile'))
+  asyncHandler(proxyToService('user', '/profile'))
 );
 
 /**

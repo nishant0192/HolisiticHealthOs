@@ -1,0 +1,5 @@
+resources:
+  - auth-service.yaml
+  - user-service.yaml
+  - integration-service.yaml
+  - api-gateway.yaml

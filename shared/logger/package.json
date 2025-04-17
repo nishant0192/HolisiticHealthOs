@@ -1,0 +1,24 @@
+{
+    "name": "@shared/logger",
+    "version": "1.0.0",
+    "description": "Thin Winston wrapper with sane defaults",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -b",
+        "clean": "rimraf dist"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "winston": "^3.10.0",
+        "winston-daily-rotate-file": "^4.7.1"
+    },
+    "devDependencies": {
+        "@types/node": "^22.14.1",
+        "rimraf": "^5.0.1",
+        "typescript": "^5.4.3"
+    }
+}

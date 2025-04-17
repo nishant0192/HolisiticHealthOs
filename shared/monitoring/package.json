@@ -1,0 +1,24 @@
+{
+    "name": "@shared/monitoring",
+    "version": "1.0.0",
+    "description": "Prometheus metrics + OpenTelemetry tracing helpers",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -b",
+        "clean": "rimraf dist"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@opentelemetry/auto-instrumentations-node": "^0.39.4",
+        "@opentelemetry/sdk-node": "^0.39.1",
+        "prom-client": "^15.1.3"
+    },
+    "devDependencies": {
+        "rimraf": "^5.0.1",
+        "typescript": "^5.4.3"
+    }
+}

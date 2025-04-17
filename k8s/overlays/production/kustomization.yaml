@@ -1,0 +1,14 @@
+bases:
+  - ../../base
+configMapGenerator:
+  - name: global-env
+    env: config-prod.yaml
+images:
+  - name: your-registry/auth-service
+    newTag: "1.0.0"
+  - name: your-registry/user-service
+    newTag: "1.0.0"
+  - name: your-registry/integration-service
+    newTag: "1.0.0"
+  - name: your-registry/api-gateway
+    newTag: "1.0.0"
