@@ -42,7 +42,7 @@ export class ActivityService {
             // Create activity record with reference to health data
             const activityParams = {
                 ...params,
-                health_data_id: healthDataId
+                health_data_id: healthDataId || undefined
             };
 
             const activity = await this.activityModel.create(activityParams);

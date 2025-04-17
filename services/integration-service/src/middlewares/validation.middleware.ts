@@ -5,21 +5,21 @@ import { ApiError } from './error.middleware';
 
 export const validate = (schema: Joi.ObjectSchema) => {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const { error } = schema.validate(req.body, { 
+    const { error } = schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true
     });
-    
+
     if (error) {
       const validationErrors = error.details.reduce((acc: Record<string, string>, curr) => {
         const key = curr.path.join('.');
         acc[key] = curr.message;
         return acc;
       }, {});
-      
+
       throw new ApiError(`Validation failed: ${error.details.map(d => d.message).join(', ')}`, 400);
     }
-    
+
     next();
   };
 };
@@ -41,7 +41,7 @@ export const integrationValidationSchemas = {
     token_expires_at: Joi.date().iso().optional(),
     scopes: Joi.array().items(Joi.string()).optional()
   }),
-  
+
   manualActivity: Joi.object({
     activity_type: Joi.string().required(),
     start_time: Joi.date().iso().required(),
@@ -55,7 +55,7 @@ export const integrationValidationSchemas = {
     heart_rate_max: Joi.number().min(0).optional(),
     metadata: Joi.object().optional()
   }),
-  
+
   manualSleep: Joi.object({
     start_time: Joi.date().iso().required(),
     end_time: Joi.date().iso().required(),
@@ -76,7 +76,7 @@ export const integrationValidationSchemas = {
     environmental_factors: Joi.object().optional(),
     metadata: Joi.object().optional()
   }),
-  
+
   manualNutrition: Joi.object({
     timestamp: Joi.date().iso().required(),
     meal_type: Joi.string().valid('breakfast', 'lunch', 'dinner', 'snack').required(),

@@ -44,7 +44,7 @@ export class NutritionService {
             // Create nutrition record with reference to health data
             const nutritionParams = {
                 ...params,
-                health_data_id: healthDataId
+                health_data_id: healthDataId ? healthDataId : undefined
             };
 
             const nutrition = await this.nutritionModel.create(nutritionParams);

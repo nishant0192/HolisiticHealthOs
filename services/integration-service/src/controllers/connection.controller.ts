@@ -128,13 +128,13 @@ export class ConnectionController {
 
         switch (provider) {
             case 'google_fit':
-                authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.GOOGLE_FIT_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.GOOGLE_FIT_REDIRECT_URI)}&scope=${encodeURIComponent('https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.sleep.read')}&response_type=code&access_type=offline&prompt=consent`;
+                authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.GOOGLE_FIT_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.GOOGLE_FIT_REDIRECT_URI!)}&scope=${encodeURIComponent('https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.sleep.read')}&response_type=code&access_type=offline&prompt=consent`;
                 break;
             case 'fitbit':
-                authUrl = `https://www.fitbit.com/oauth2/authorize?client_id=${process.env.FITBIT_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.FITBIT_REDIRECT_URI)}&scope=${encodeURIComponent('activity heartrate sleep nutrition')}&response_type=code`;
+                authUrl = `https://www.fitbit.com/oauth2/authorize?client_id=${process.env.FITBIT_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.FITBIT_REDIRECT_URI!)}&scope=${encodeURIComponent('activity heartrate sleep nutrition')}&response_type=code`;
                 break;
             case 'garmin':
-                authUrl = `https://connect.garmin.com/oauthConfirm?client_id=${process.env.GARMIN_CONSUMER_KEY}&redirect_uri=${encodeURIComponent(process.env.GARMIN_REDIRECT_URI)}&response_type=code&scope=activity sleep nutrition`;
+                authUrl = `https://connect.garmin.com/oauthConfirm?client_id=${process.env.GARMIN_CONSUMER_KEY}&redirect_uri=${encodeURIComponent(process.env.GARMIN_REDIRECT_URI!)}&response_type=code&scope=activity sleep nutrition`;
                 break;
             default:
                 throw new ApiError(`Unsupported provider: ${provider}`, 400);
@@ -151,7 +151,7 @@ export class ConnectionController {
      */
     handleOAuthCallback = asyncHandler(async (req: Request, res: Response, _next: NextFunction) => {
         const provider = req.params.provider as Provider;
-        const { code, state, error } = req.query;
+        const { code, error } = req.query;
 
         // Check for error in callback
         if (error) {

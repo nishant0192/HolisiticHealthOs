@@ -162,7 +162,7 @@ export class SleepModel {
       `;
       
       const result = await pool.query(query, [userId, sourceProvider]);
-      return result.rowCount;
+      return result.rowCount ?? 0;
     } catch (error) {
       logger.error('Error in SleepModel.deleteByUserAndSource:', error);
       throw error;

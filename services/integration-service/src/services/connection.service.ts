@@ -2,10 +2,10 @@
 import { ConnectionModel, Connection, CreateConnectionParams, Provider, UpdateConnectionParams } from '../models/connection.model';
 import { ApiError } from '../middlewares/error.middleware';
 import { logger } from '../middlewares/logging.middleware';
-import * as appleHealth from '../adapters/apple-health';
-import * as googleFit from '../adapters/google-fit';
-import * as fitbit from '../adapters/fitbit';
-import * as garmin from '../adapters/garmin';
+// import * as appleHealth from '../adapters/apple-health';
+// import * as googleFit from '../adapters/google-fit';
+// import * as fitbit from '../adapters/fitbit';
+// import * as garmin from '../adapters/garmin';
 import * as oauth from '../utils/oauth';
 
 export class ConnectionService {
@@ -151,7 +151,7 @@ export class ConnectionService {
                 provider,
                 access_token: accessToken,
                 refresh_token: refreshToken,
-                token_expires_at: tokenExpiresAt
+                token_expires_at: tokenExpiresAt || undefined
             };
 
             const connection = await this.connectionModel.create(connectionParams);

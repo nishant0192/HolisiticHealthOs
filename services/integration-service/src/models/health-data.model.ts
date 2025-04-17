@@ -124,7 +124,7 @@ export class HealthDataModel {
       `;
 
       const result = await pool.query(query, values);
-      return result.rowCount;
+      return result.rowCount ?? 0;
     } catch (error) {
       logger.error('Error in HealthDataModel.bulkCreate:', error);
       throw error;
@@ -203,7 +203,7 @@ export class HealthDataModel {
         `;
 
       const result = await pool.query(query, [userId, sourceProvider]);
-      return result.rowCount;
+      return result.rowCount ?? 0;
     } catch (error) {
       logger.error('Error in HealthDataModel.deleteByUserAndSource:', error);
       throw error;

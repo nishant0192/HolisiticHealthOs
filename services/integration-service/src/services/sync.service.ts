@@ -16,8 +16,8 @@ import * as appleHealth from '../adapters/apple-health';
 import * as googleFit from '../adapters/google-fit';
 import * as fitbit from '../adapters/fitbit';
 import * as garmin from '../adapters/garmin';
-import * as samsungHealth from '../adapters/samsung-health';
-import * as withings from '../adapters/withings';
+// import * as samsungHealth from '../adapters/samsung-health';
+// import * as withings from '../adapters/withings';
 
 export class SyncService {
     private connectionService: ConnectionService;
@@ -80,7 +80,6 @@ export class SyncService {
                     const updatedConnection = await this.connectionService.getConnectionById(connection.id);
 
                     // Decrypt the new tokens
-                    const newAccessToken = tokenEncryption.decrypt(updatedConnection.access_token);
                     refreshToken = updatedConnection.refresh_token ?
                         tokenEncryption.decrypt(updatedConnection.refresh_token) : null;
                 } catch (error) {
@@ -430,10 +429,10 @@ export class SyncService {
      * Sync data from Samsung Health
      */
     private async syncSamsungHealthData(
-        accessToken: string,
-        userId: string,
-        startDate: Date,
-        endDate: Date
+        _accessToken: string,
+        _userId: string,
+        _startDate: Date,
+        _endDate: Date
     ): Promise<{
         activitiesCount: number;
         sleepCount: number;
@@ -460,10 +459,10 @@ export class SyncService {
      * Sync data from Withings
      */
     private async syncWithingsData(
-        accessToken: string,
-        userId: string,
-        startDate: Date,
-        endDate: Date
+        _accessToken: string,
+        _userId: string,
+        _startDate: Date,
+        _endDate: Date
     ): Promise<{
         activitiesCount: number;
         sleepCount: number;

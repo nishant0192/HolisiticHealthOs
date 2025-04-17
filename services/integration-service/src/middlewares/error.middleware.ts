@@ -17,13 +17,13 @@ export class ApiError extends Error {
 }
 
 // For 404 errors
-export const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
+export const notFoundHandler = (req: Request, _res: Response, next: NextFunction) => {
   const err = new ApiError(`Not Found - ${req.originalUrl}`, 404);
   next(err);
 };
 
 // Global error handler
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
   logger.error('Error:', err);
 
   const statusCode = err.statusCode || 500;
