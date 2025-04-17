@@ -26,7 +26,7 @@ const generateClientSecret = (): string => {
         sub: clientId,
     };
 
-    const options = {
+    const options: jwt.SignOptions = {
         algorithm: 'ES256',
         keyid: keyId
     };
@@ -90,7 +90,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AppleHea
 /**
  * Get user profile
  */
-export const getUserProfile = async (accessToken: string): Promise<AppleHealthProfile> => {
+export const getUserProfile = async (_accessToken: string): Promise<AppleHealthProfile> => {
     try {
         // This is a simulated implementation since Apple Health doesn't have a direct API
         // In a real implementation, you would use the actual Apple Health Kit
@@ -111,9 +111,9 @@ export const getUserProfile = async (accessToken: string): Promise<AppleHealthPr
  * Get activities
  */
 export const getActivities = async (
-    accessToken: string,
-    startDate: Date,
-    endDate: Date
+    _accessToken: string,
+    _startDate: Date,
+    _endDate: Date
 ): Promise<AppleHealthActivity[]> => {
     try {
         // This is a simulated implementation since Apple Health doesn't have a direct API
@@ -145,9 +145,9 @@ export const getActivities = async (
  * Get sleep data
  */
 export const getSleepData = async (
-    accessToken: string,
-    startDate: Date,
-    endDate: Date
+    _accessToken: string,
+    _startDate: Date,
+    _endDate: Date
 ): Promise<AppleHealthSleep[]> => {
     try {
         // This is a simulated implementation
@@ -192,9 +192,9 @@ export const getSleepData = async (
  * Get nutrition data
  */
 export const getNutritionData = async (
-    accessToken: string,
-    startDate: Date,
-    endDate: Date
+    _accessToken: string,
+    _startDate: Date,
+    _endDate: Date
 ): Promise<AppleHealthNutrition[]> => {
     try {
         // This is a simulated implementation

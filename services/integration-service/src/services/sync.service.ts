@@ -10,10 +10,14 @@ import { NutritionModel } from '../models/nutrition.model';
 import { Provider } from '../models/connection.model';
 import { ApiError } from '../middlewares/error.middleware';
 import { logger } from '../middlewares/logging.middleware';
+import { rateLimiter } from '../utils/rate-limiter';
+import { tokenEncryption } from '../utils/token-encryption';
 import * as appleHealth from '../adapters/apple-health';
 import * as googleFit from '../adapters/google-fit';
 import * as fitbit from '../adapters/fitbit';
 import * as garmin from '../adapters/garmin';
+import * as samsungHealth from '../adapters/samsung-health';
+import * as withings from '../adapters/withings';
 
 export class SyncService {
     private connectionService: ConnectionService;
@@ -62,11 +66,23 @@ export class SyncService {
                 throw new ApiError(`Connection is not active: ${connection.status}`, 400);
             }
 
+            // Decrypt access token
+            const accessToken = tokenEncryption.decrypt(connection.access_token);
+            let refreshToken = connection.refresh_token ? tokenEncryption.decrypt(connection.refresh_token) : null;
+
             // Check if token is expired
             if (connection.token_expires_at && new Date() > connection.token_expires_at) {
                 // Try to refresh token
                 try {
                     await this.connectionService.refreshConnectionToken(connection.id);
+
+                    // Get updated connection with new token
+                    const updatedConnection = await this.connectionService.getConnectionById(connection.id);
+
+                    // Decrypt the new tokens
+                    const newAccessToken = tokenEncryption.decrypt(updatedConnection.access_token);
+                    refreshToken = updatedConnection.refresh_token ?
+                        tokenEncryption.decrypt(updatedConnection.refresh_token) : null;
                 } catch (error) {
                     logger.error('Failed to refresh token during sync:', error);
                     throw new ApiError('Connection token has expired and could not be refreshed', 401);
@@ -87,7 +103,7 @@ export class SyncService {
 
             switch (provider) {
                 case 'apple_health':
-                    const appleHealthResult = await this.syncAppleHealthData(connection.access_token, userId, startDate, endDate);
+                    const appleHealthResult = await this.syncAppleHealthData(accessToken, userId, startDate, endDate);
                     activitiesCount = appleHealthResult.activitiesCount;
                     sleepCount = appleHealthResult.sleepCount;
                     nutritionCount = appleHealthResult.nutritionCount;
@@ -95,7 +111,7 @@ export class SyncService {
                     break;
 
                 case 'google_fit':
-                    const googleFitResult = await this.syncGoogleFitData(connection.access_token, userId, startDate, endDate);
+                    const googleFitResult = await this.syncGoogleFitData(accessToken, userId, startDate, endDate);
                     activitiesCount = googleFitResult.activitiesCount;
                     sleepCount = googleFitResult.sleepCount;
                     nutritionCount = googleFitResult.nutritionCount;
@@ -103,7 +119,7 @@ export class SyncService {
                     break;
 
                 case 'fitbit':
-                    const fitbitResult = await this.syncFitbitData(connection.access_token, userId, startDate, endDate);
+                    const fitbitResult = await this.syncFitbitData(accessToken, userId, startDate, endDate);
                     activitiesCount = fitbitResult.activitiesCount;
                     sleepCount = fitbitResult.sleepCount;
                     nutritionCount = fitbitResult.nutritionCount;
@@ -111,11 +127,34 @@ export class SyncService {
                     break;
 
                 case 'garmin':
-                    const garminResult = await this.syncGarminData(connection.access_token, userId, startDate, endDate);
+                    // Garmin uses OAuth 1.0a so we need a token object
+                    const garminToken = {
+                        oauth_token: accessToken,
+                        oauth_token_secret: refreshToken || '',
+                        user_id: connection.metadata?.user_id || ''
+                    };
+
+                    const garminResult = await this.syncGarminData(garminToken, userId, startDate, endDate);
                     activitiesCount = garminResult.activitiesCount;
                     sleepCount = garminResult.sleepCount;
                     nutritionCount = garminResult.nutritionCount;
                     healthDataCount = garminResult.healthDataCount;
+                    break;
+
+                case 'samsung_health':
+                    const samsungHealthResult = await this.syncSamsungHealthData(accessToken, userId, startDate, endDate);
+                    activitiesCount = samsungHealthResult.activitiesCount;
+                    sleepCount = samsungHealthResult.sleepCount;
+                    nutritionCount = samsungHealthResult.nutritionCount;
+                    healthDataCount = samsungHealthResult.healthDataCount;
+                    break;
+
+                case 'withings':
+                    const withingsResult = await this.syncWithingsData(accessToken, userId, startDate, endDate);
+                    activitiesCount = withingsResult.activitiesCount;
+                    sleepCount = withingsResult.sleepCount;
+                    nutritionCount = withingsResult.nutritionCount;
+                    healthDataCount = withingsResult.healthDataCount;
                     break;
 
                 default:
@@ -125,6 +164,9 @@ export class SyncService {
             // Update last synced timestamp
             await this.connectionService.updateLastSynced(connection.id);
 
+            // Reset error count in rate limiter
+            rateLimiter.resetErrorCount(`${provider}-api`);
+
             return {
                 activitiesCount,
                 sleepCount,
@@ -132,6 +174,9 @@ export class SyncService {
                 healthDataCount
             };
         } catch (error) {
+            // Record error for rate limiting backoff
+            rateLimiter.recordError(`${provider}-api`);
+
             if (error instanceof ApiError) {
                 throw error;
             }
@@ -244,13 +289,58 @@ export class SyncService {
         healthDataCount: number;
     }> {
         try {
-            // This would be a full implementation in a real service
-            // For now, we'll just return 0 counts
+            // Fetch data from Fitbit
+            const activities = await fitbit.client.getActivities(accessToken, startDate, endDate);
+            const sleepData = await fitbit.client.getSleepData(accessToken, startDate, endDate);
+            const nutritionData = await fitbit.client.getNutritionData(accessToken, startDate, endDate);
+
+            // Map data to our format
+            const mappedActivities = fitbit.mapper.mapActivities(activities, userId);
+            const mappedSleepData = fitbit.mapper.mapSleepData(sleepData, userId);
+            const mappedNutritionData = fitbit.mapper.mapNutritionData(nutritionData, userId);
+            const mappedHealthData = fitbit.mapper.mapToHealthData(activities, sleepData, nutritionData, userId);
+
+            // Save data to database using batch operations
+            const activityBatches = this.chunkArray(mappedActivities, 50);
+            let activityCount = 0;
+
+            for (const batch of activityBatches) {
+                activityCount += await this.activityModel.bulkCreate(batch);
+            }
+
+            // Create sleep records (these typically need to be processed individually due to sleep stages)
+            let sleepCount = 0;
+            for (const sleepRecord of mappedSleepData) {
+                try {
+                    await this.sleepService.createSleep(sleepRecord);
+                    sleepCount++;
+                } catch (error) {
+                    logger.error(`Error creating sleep record: ${error}`);
+                    // Continue with other records
+                }
+            }
+
+            // Create nutrition records
+            const nutritionBatches = this.chunkArray(mappedNutritionData, 50);
+            let nutritionCount = 0;
+
+            for (const batch of nutritionBatches) {
+                nutritionCount += await this.nutritionService.bulkCreate(batch);
+            }
+
+            // Create health data records
+            const healthDataBatches = this.chunkArray(mappedHealthData, 100);
+            let healthDataCount = 0;
+
+            for (const batch of healthDataBatches) {
+                healthDataCount += await this.healthDataModel.bulkCreate(batch);
+            }
+
             return {
-                activitiesCount: 0,
-                sleepCount: 0,
-                nutritionCount: 0,
-                healthDataCount: 0
+                activitiesCount: activityCount,
+                sleepCount,
+                nutritionCount,
+                healthDataCount
             };
         } catch (error) {
             logger.error('Error in SyncService.syncFitbitData:', error);
@@ -262,6 +352,84 @@ export class SyncService {
      * Sync data from Garmin
      */
     private async syncGarminData(
+        token: {
+            oauth_token: string;
+            oauth_token_secret: string;
+            user_id: string;
+        },
+        userId: string,
+        startDate: Date,
+        endDate: Date
+    ): Promise<{
+        activitiesCount: number;
+        sleepCount: number;
+        nutritionCount: number;
+        healthDataCount: number;
+    }> {
+        try {
+            // Fetch data from Garmin
+            const activities = await garmin.client.getActivities(token, startDate, endDate);
+            const sleepData = await garmin.client.getSleepData(token, startDate, endDate);
+            const nutritionData = await garmin.client.getNutritionData(token, startDate, endDate);
+
+            // Map data to our format
+            const mappedActivities = garmin.mapper.mapActivities(activities, userId);
+            const mappedSleepData = garmin.mapper.mapSleepData(sleepData, userId);
+            const mappedNutritionData = garmin.mapper.mapNutritionData(nutritionData, userId);
+            const mappedHealthData = garmin.mapper.mapToHealthData(activities, sleepData, nutritionData, userId);
+
+            // Save data to database using batch operations
+            const activityBatches = this.chunkArray(mappedActivities, 50);
+            let activityCount = 0;
+
+            for (const batch of activityBatches) {
+                activityCount += await this.activityModel.bulkCreate(batch);
+            }
+
+            // Create sleep records (these typically need to be processed individually due to sleep stages)
+            let sleepCount = 0;
+            for (const sleepRecord of mappedSleepData) {
+                try {
+                    await this.sleepService.createSleep(sleepRecord);
+                    sleepCount++;
+                } catch (error) {
+                    logger.error(`Error creating sleep record: ${error}`);
+                    // Continue with other records
+                }
+            }
+
+            // Create nutrition records
+            const nutritionBatches = this.chunkArray(mappedNutritionData, 50);
+            let nutritionCount = 0;
+
+            for (const batch of nutritionBatches) {
+                nutritionCount += await this.nutritionService.bulkCreate(batch);
+            }
+
+            // Create health data records
+            const healthDataBatches = this.chunkArray(mappedHealthData, 100);
+            let healthDataCount = 0;
+
+            for (const batch of healthDataBatches) {
+                healthDataCount += await this.healthDataModel.bulkCreate(batch);
+            }
+
+            return {
+                activitiesCount: activityCount,
+                sleepCount,
+                nutritionCount,
+                healthDataCount
+            };
+        } catch (error) {
+            logger.error('Error in SyncService.syncGarminData:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Sync data from Samsung Health
+     */
+    private async syncSamsungHealthData(
         accessToken: string,
         userId: string,
         startDate: Date,
@@ -273,8 +441,9 @@ export class SyncService {
         healthDataCount: number;
     }> {
         try {
-            // This would be a full implementation in a real service
-            // For now, we'll just return 0 counts
+            // For now, this is a placeholder since Samsung Health is not fully implemented
+            logger.info('Samsung Health sync requested but not fully implemented');
+
             return {
                 activitiesCount: 0,
                 sleepCount: 0,
@@ -282,7 +451,37 @@ export class SyncService {
                 healthDataCount: 0
             };
         } catch (error) {
-            logger.error('Error in SyncService.syncGarminData:', error);
+            logger.error('Error in SyncService.syncSamsungHealthData:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Sync data from Withings
+     */
+    private async syncWithingsData(
+        accessToken: string,
+        userId: string,
+        startDate: Date,
+        endDate: Date
+    ): Promise<{
+        activitiesCount: number;
+        sleepCount: number;
+        nutritionCount: number;
+        healthDataCount: number;
+    }> {
+        try {
+            // For now, this is a placeholder since Withings is not fully implemented
+            logger.info('Withings sync requested but not fully implemented');
+
+            return {
+                activitiesCount: 0,
+                sleepCount: 0,
+                nutritionCount: 0,
+                healthDataCount: 0
+            };
+        } catch (error) {
+            logger.error('Error in SyncService.syncWithingsData:', error);
             throw error;
         }
     }
@@ -359,7 +558,7 @@ export class SyncService {
     async getSyncStatus(userId: string): Promise<any[]> {
         try {
             const connections = await this.connectionService.getActiveConnectionsByUser(userId);
-            
+
             return connections.map(conn => ({
                 id: conn.id,
                 provider: conn.provider,
@@ -371,5 +570,16 @@ export class SyncService {
             logger.error('Error in SyncService.getSyncStatus:', error);
             throw new ApiError('Failed to get sync status', 500);
         }
+    }
+
+    /**
+     * Helper method to chunk an array into smaller arrays
+     */
+    private chunkArray<T>(array: T[], chunkSize: number): T[][] {
+        const chunks: T[][] = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+            chunks.push(array.slice(i, i + chunkSize));
+        }
+        return chunks;
     }
 }
