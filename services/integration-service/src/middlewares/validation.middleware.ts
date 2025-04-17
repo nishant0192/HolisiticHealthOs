@@ -26,7 +26,7 @@ export const validate = (schema: Joi.ObjectSchema) => {
 
 export const integrationValidationSchemas = {
   createConnection: Joi.object({
-    provider: Joi.string().required().valid('apple_health', 'google_fit', 'fitbit', 'garmin'),
+    provider: Joi.string().required().valid('apple_health', 'google_fit', 'fitbit', 'garmin', 'samsung_health', 'withings'),
     code: Joi.string().when('provider', {
       is: Joi.valid('google_fit', 'fitbit', 'garmin'),
       then: Joi.required(),

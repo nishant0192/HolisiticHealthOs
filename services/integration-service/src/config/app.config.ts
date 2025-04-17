@@ -40,6 +40,16 @@ interface AppConfig {
       consumerSecret: string;
       redirectUri: string;
     };
+    samsungHealth: {
+      clientId: string;
+      clientSecret: string;
+      redirectUri: string;
+    };
+    withings: {
+      clientId: string;
+      clientSecret: string;
+      redirectUri: string;
+    };
   };
 }
 
@@ -77,8 +87,17 @@ const appConfig: AppConfig = {
       consumerKey: process.env.GARMIN_CONSUMER_KEY || '',
       consumerSecret: process.env.GARMIN_CONSUMER_SECRET || '',
       redirectUri: process.env.GARMIN_REDIRECT_URI || 'http://localhost:3003/api/v1/connection/garmin/callback'
+    },
+    samsungHealth: {
+      clientId: process.env.SAMSUNG_HEALTH_CLIENT_ID || '',
+      clientSecret: process.env.SAMSUNG_HEALTH_CLIENT_SECRET || '',
+      redirectUri: process.env.SAMSUNG_HEALTH_REDIRECT_URI || 'http://localhost:3003/api/v1/connection/samsung-health/callback'
+    },
+    withings: {
+      clientId: process.env.WITHINGS_CLIENT_ID || '',
+      clientSecret: process.env.WITHINGS_CLIENT_SECRET || '',
+      redirectUri: process.env.WITHINGS_REDIRECT_URI || 'http://localhost:3003/api/v1/connection/withings/callback'
     }
   }
-};
-
+}
 export default appConfig;

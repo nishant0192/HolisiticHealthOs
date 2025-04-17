@@ -2,7 +2,7 @@ import { pool } from '../config/database.config';
 import { logger } from '../middlewares/logging.middleware';
 import { v4 as uuidv4 } from 'uuid';
 
-export type Provider = 'apple_health' | 'google_fit' | 'fitbit' | 'garmin';
+export type Provider = 'apple_health' | 'google_fit' | 'fitbit' | 'garmin' | 'samsung_health' | 'withings';;
 
 export interface Connection {
   id: string;

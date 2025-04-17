@@ -35,7 +35,7 @@ export class ConnectionController {
         const provider = req.params.provider as Provider;
 
         // Validate provider
-        if (!['apple_health', 'google_fit', 'fitbit', 'garmin'].includes(provider)) {
+        if (!['apple_health', 'google_fit', 'fitbit', 'garmin', 'samsung_health', 'withings'].includes(provider)) {
             throw new ApiError(`Invalid provider: ${provider}`, 400);
         }
 
