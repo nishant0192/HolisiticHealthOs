@@ -1,0 +1,10 @@
+# node & build artifacts
+node_modules
+dist
+coverage
+
+# monorepo extras
+client/
+docs/
+*.log
+.git

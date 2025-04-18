@@ -1,0 +1,69 @@
+# docker-compose.yml  — repo root
+# ------------------------------------------------
+services:
+  # ---------- API Gateway ----------
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:3000"
+    env_file:
+      - services/api-gateway/.env
+    depends_on:
+      - auth-service
+      - user-service
+      - integration-service
+    networks: [ app-net ]
+
+  # ---------- Auth Service ----------
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - services/auth-service/.env
+    networks: [ app-net ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ---------- User Service ----------
+  user-service:
+    build:
+      context: ./services/user-service
+    container_name: user-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - services/user-service/.env
+    networks: [ app-net ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ---------- Integration Service ----------
+  integration-service:
+    build:
+      context: ./services/integration-service
+    container_name: integration-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - services/integration-service/.env
+    networks: [ app-net ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app-net:
+    driver: bridge
