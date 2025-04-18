@@ -40,6 +40,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(requestLogger);
 app.use(detailedLogger);
 
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'User service is running',
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version || 'unknown'
+  });
+});
+
 // Apply routes
 app.use(appConfig.apiPrefix, routes);
 

@@ -35,6 +35,15 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Auth service is running',
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version || 'unknown'
+  });
+});
+
 // Apply routes
 app.use(appConfig.apiPrefix, routes);
 
