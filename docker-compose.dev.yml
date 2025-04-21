@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: holistic-health-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: holistic_health_os
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./tools/database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile.dev
+    container_name: auth-service
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./services/auth-service/.env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  # User Service
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile.dev
+    container_name: user-service
+    volumes:
+      - ./services/user-service:/app
+      - /app/node_modules
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./services/user-service/.env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  # Integration Service
+  integration-service:
+    build:
+      context: ./services/integration-service
+      dockerfile: Dockerfile.dev
+    container_name: integration-service
+    volumes:
+      - ./services/integration-service:/app
+      - /app/node_modules
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./services/integration-service/.env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile.dev
+    container_name: api-gateway
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/node_modules
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./services/api-gateway/.env.development
+    depends_on:
+      - auth-service
+      - user-service
+      - integration-service
+    networks:
+      - app-net
+
+  # Development tools
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8082:8080"
+    networks:
+      - app-net
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
