@@ -1,6 +1,6 @@
 // src/services/sync.service.ts
 import { ConnectionService } from './connection.service';
-import { ActivityService } from './activity.service';
+// import { ActivityService } from './activity.service';
 import { SleepService } from './sleep.service';
 import { NutritionService } from './nutrition.service';
 import { HealthDataModel } from '../models/health-data.model';
@@ -21,7 +21,7 @@ import * as garmin from '../adapters/garmin';
 
 export class SyncService {
     private connectionService: ConnectionService;
-    private activityService: ActivityService;
+    // private activityService: ActivityService;
     private sleepService: SleepService;
     private nutritionService: NutritionService;
     private healthDataModel: HealthDataModel;
@@ -31,7 +31,7 @@ export class SyncService {
 
     constructor() {
         this.connectionService = new ConnectionService();
-        this.activityService = new ActivityService();
+        // this.activityService = new ActivityService();
         this.sleepService = new SleepService();
         this.nutritionService = new NutritionService();
         this.healthDataModel = new HealthDataModel();

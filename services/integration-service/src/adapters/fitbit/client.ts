@@ -139,16 +139,16 @@ export const getActivities = async (
       await rateLimiter.consume('fitbit-api', 1);
       
       // Get detailed activity info if needed
-      const detailResponse = await axios.get(
-        `${BASE_URL}/${API_VERSION}/user/-/activities/${activity.logId}.json`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }
-      );
+      // const detailResponse = await axios.get(
+      //   `${BASE_URL}/${API_VERSION}/user/-/activities/${activity.logId}.json`,
+      //   {
+      //     headers: {
+      //       'Authorization': `Bearer ${accessToken}`
+      //     }
+      //   }
+      // );
       
-      const activityDetail = detailResponse.data;
+      // const activityDetail = detailResponse.data;
       
       activities.push({
         id: activity.logId.toString(),
@@ -297,7 +297,7 @@ export const getNutritionData = async (
       const foodLog = response.data;
       
       // Group foods by meal
-      const meals = {};
+      const meals: { [key: string]: { name: string; foods: any[] } } = {};
       for (const food of foodLog.foods) {
         if (!meals[food.loggedFood.mealTypeId]) {
           meals[food.loggedFood.mealTypeId] = {
@@ -343,7 +343,7 @@ export const getNutritionData = async (
           },
           waterConsumption: foodLog.summary.water || 0,
           sourceDevice: {
-            id: null,
+            id: undefined,
             name: 'Fitbit',
             type: 'App'
           }

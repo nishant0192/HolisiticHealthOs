@@ -102,7 +102,7 @@ export const getRequestToken = async (): Promise<{
             requestData.url,
             null,
             {
-                headers: authHeader
+                headers: authHeader as unknown as Record<string, string>
             }
         );
 
@@ -143,7 +143,7 @@ export const getUserProfile = async (token: GarminToken): Promise<GarminProfile>
         const response = await axios.get(
             requestData.url,
             {
-                headers: authHeader
+                headers: authHeader as unknown as Record<string, string>
             }
         );
 
@@ -198,7 +198,7 @@ export const getActivities = async (
         const response = await axios.get(
             requestData.url,
             {
-                headers: authHeader
+                headers: authHeader as unknown as Record<string, string>
             }
         );
 
@@ -222,7 +222,7 @@ export const getActivities = async (
             const detailResponse = await axios.get(
                 detailRequestData.url,
                 {
-                    headers: detailAuthHeader
+                    headers: detailAuthHeader as unknown as Record<string, string>
                 }
             );
 
@@ -283,7 +283,7 @@ export const getSleepData = async (
         const response = await axios.get(
             requestData.url,
             {
-                headers: authHeader
+                headers: authHeader as unknown as Record<string, string>
             }
         );
 
@@ -367,7 +367,7 @@ export const getNutritionData = async (
                 const response = await axios.get(
                     requestData.url,
                     {
-                        headers: authHeader
+                        headers: authHeader as unknown as Record<string, string>
                     }
                 );
 
@@ -377,7 +377,7 @@ export const getNutritionData = async (
                 if (nutrition.meals && nutrition.meals.length > 0) {
                     for (const meal of nutrition.meals) {
                         // Process foods for this meal
-                        const foods = meal.components?.map(comp => ({
+                        const foods = meal.components?.map((comp: { description: any; amount: any; unit: any; calories: any; macronutrients: { carbohydrates: any; fat: any; protein: any; fiber: any; }; }) => ({
                             name: comp.description,
                             quantity: comp.amount,
                             unit: comp.unit,
@@ -391,11 +391,11 @@ export const getNutritionData = async (
                         })) || [];
 
                         // Calculate totals
-                        const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0);
-                        const totalProtein = foods.reduce((sum, food) => sum + food.nutrients.protein, 0);
-                        const totalCarbs = foods.reduce((sum, food) => sum + food.nutrients.carbs, 0);
-                        const totalFat = foods.reduce((sum, food) => sum + food.nutrients.fat, 0);
-                        const totalFiber = foods.reduce((sum, food) => sum + food.nutrients.fiber, 0);
+                        const totalCalories = foods.reduce((sum: any, food: { calories: any; }) => sum + food.calories, 0);
+                        const totalProtein = foods.reduce((sum: any, food: { nutrients: { protein: any; }; }) => sum + food.nutrients.protein, 0);
+                        const totalCarbs = foods.reduce((sum: any, food: { nutrients: { carbs: any; }; }) => sum + food.nutrients.carbs, 0);
+                        const totalFat = foods.reduce((sum: any, food: { nutrients: { fat: any; }; }) => sum + food.nutrients.fat, 0);
+                        const totalFiber = foods.reduce((sum: any, food: { nutrients: { fiber: any; }; }) => sum + food.nutrients.fiber, 0);
 
                         nutritionData.push({
                             id: `${formattedDate}-${meal.mealType}`,

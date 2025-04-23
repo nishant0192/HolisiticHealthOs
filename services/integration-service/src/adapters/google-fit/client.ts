@@ -114,8 +114,8 @@ export const getActivities = async (
     await rateLimiter.consume('google-fit-api', 1);
 
     // Convert dates to milliseconds
-    const startTimeMillis = startDate.getTime();
-    const endTimeMillis = endDate.getTime();
+    // const startTimeMillis = startDate.getTime();
+    // const endTimeMillis = endDate.getTime();
     
     // Fetch sessions
     const response = await axios.get(
@@ -233,8 +233,8 @@ export const getSleepData = async (
     await rateLimiter.consume('google-fit-api', 1);
 
     // Convert dates to milliseconds
-    const startTimeMillis = startDate.getTime();
-    const endTimeMillis = endDate.getTime();
+    // const startTimeMillis = startDate.getTime();
+    // const endTimeMillis = endDate.getTime();
     
     // Fetch sleep sessions
     const response = await axios.get(

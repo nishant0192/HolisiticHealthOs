@@ -64,11 +64,11 @@ export const mapActivities = (
     calories_burned: activity.calories,
     steps: activity.steps,
     heart_rate_avg: activity.heartRateZones ? 
-      calculateAvgHeartRate(activity.heartRateZones) : null,
+      calculateAvgHeartRate(activity.heartRateZones) : undefined,
     heart_rate_max: activity.heartRateZones ? 
-      calculateMaxHeartRate(activity.heartRateZones) : null,
+      calculateMaxHeartRate(activity.heartRateZones) : undefined,
     source_provider: 'fitbit',
-    source_device_id: activity.sourceDevice?.id || null,
+    source_device_id: activity.sourceDevice?.id || undefined,
     metadata: {
       original_id: activity.id,
       source_name: activity.sourceDevice?.name,
@@ -99,7 +99,7 @@ export const mapSleepData = (
     })),
     quality: sleep.efficiency,
     source_provider: 'fitbit',
-    source_device_id: sleep.sourceDevice?.id || null,
+    source_device_id: sleep.sourceDevice?.id || undefined,
     metadata: {
       original_id: sleep.id,
       source_name: sleep.sourceDevice?.name,
@@ -145,7 +145,7 @@ export const mapNutritionData = (
     },
     water_intake_ml: nutrition.waterConsumption,
     source_provider: 'fitbit',
-    source_app_id: nutrition.sourceDevice?.id || null,
+    source_app_id: nutrition.sourceDevice?.id || undefined,
     metadata: {
       original_id: nutrition.id,
       source_name: nutrition.sourceDevice?.name,
@@ -178,7 +178,7 @@ export const mapToHealthData = (
         start_time: new Date(activity.startTime),
         end_time: new Date(new Date(activity.startTime).getTime() + activity.duration),
         source_provider: 'fitbit',
-        source_device_id: activity.sourceDevice?.id || null,
+        source_device_id: activity.sourceDevice?.id || undefined,
         metadata: {
           original_id: activity.id,
           activity_type: activity.name
@@ -197,7 +197,7 @@ export const mapToHealthData = (
         start_time: new Date(activity.startTime),
         end_time: new Date(new Date(activity.startTime).getTime() + activity.duration),
         source_provider: 'fitbit',
-        source_device_id: activity.sourceDevice?.id || null,
+        source_device_id: activity.sourceDevice?.id || undefined,
         metadata: {
           original_id: activity.id,
           activity_type: activity.name
@@ -216,7 +216,7 @@ export const mapToHealthData = (
         start_time: new Date(activity.startTime),
         end_time: new Date(new Date(activity.startTime).getTime() + activity.duration),
         source_provider: 'fitbit',
-        source_device_id: activity.sourceDevice?.id || null,
+        source_device_id: activity.sourceDevice?.id || undefined,
         metadata: {
           original_id: activity.id,
           activity_type: activity.name
@@ -238,7 +238,7 @@ export const mapToHealthData = (
           start_time: new Date(activity.startTime),
           end_time: new Date(new Date(activity.startTime).getTime() + activity.duration),
           source_provider: 'fitbit',
-          source_device_id: activity.sourceDevice?.id || null,
+          source_device_id: activity.sourceDevice?.id || undefined,
           metadata: {
             original_id: activity.id,
             activity_type: activity.name
@@ -259,7 +259,7 @@ export const mapToHealthData = (
       start_time: new Date(sleep.startTime),
       end_time: new Date(sleep.endTime),
       source_provider: 'fitbit',
-      source_device_id: sleep.sourceDevice?.id || null,
+      source_device_id: sleep.sourceDevice?.id || undefined,
       metadata: {
         original_id: sleep.id,
         efficiency: sleep.efficiency
@@ -277,7 +277,7 @@ export const mapToHealthData = (
         start_time: new Date(sleep.startTime),
         end_time: new Date(sleep.endTime),
         source_provider: 'fitbit',
-        source_device_id: sleep.sourceDevice?.id || null,
+        source_device_id: sleep.sourceDevice?.id || undefined,
         metadata: {
           original_id: sleep.id
         }
@@ -301,7 +301,7 @@ export const mapToHealthData = (
         start_time: new Date(sleep.startTime),
         end_time: new Date(sleep.endTime),
         source_provider: 'fitbit',
-        source_device_id: sleep.sourceDevice?.id || null,
+        source_device_id: sleep.sourceDevice?.id || undefined,
         metadata: {
           original_id: sleep.id
         }
@@ -325,7 +325,7 @@ export const mapToHealthData = (
         start_time: new Date(sleep.startTime),
         end_time: new Date(sleep.endTime),
         source_provider: 'fitbit',
-        source_device_id: sleep.sourceDevice?.id || null,
+        source_device_id: sleep.sourceDevice?.id || undefined,
         metadata: {
           original_id: sleep.id
         }
@@ -345,7 +345,7 @@ export const mapToHealthData = (
         unit: 'kcal',
         start_time: new Date(nutrition.date),
         source_provider: 'fitbit',
-        source_app_id: nutrition.sourceDevice?.id || null,
+        source_app_id: nutrition.sourceDevice?.id || undefined,
         metadata: {
           original_id: nutrition.id,
           meal_type: nutrition.mealType
@@ -363,7 +363,7 @@ export const mapToHealthData = (
         unit: 'g',
         start_time: new Date(nutrition.date),
         source_provider: 'fitbit',
-        source_app_id: nutrition.sourceDevice?.id || null,
+        source_app_id: nutrition.sourceDevice?.id || undefined,
         metadata: {
           original_id: nutrition.id,
           meal_type: nutrition.mealType
@@ -381,7 +381,7 @@ export const mapToHealthData = (
         unit: 'g',
         start_time: new Date(nutrition.date),
         source_provider: 'fitbit',
-        source_app_id: nutrition.sourceDevice?.id || null,
+        source_app_id: nutrition.sourceDevice?.id || undefined,
         metadata: {
           original_id: nutrition.id,
           meal_type: nutrition.mealType
@@ -399,7 +399,7 @@ export const mapToHealthData = (
         unit: 'g',
         start_time: new Date(nutrition.date),
         source_provider: 'fitbit',
-        source_app_id: nutrition.sourceDevice?.id || null,
+        source_app_id: nutrition.sourceDevice?.id || undefined,
         metadata: {
           original_id: nutrition.id,
           meal_type: nutrition.mealType
@@ -417,7 +417,7 @@ export const mapToHealthData = (
         unit: 'g',
         start_time: new Date(nutrition.date),
         source_provider: 'fitbit',
-        source_app_id: nutrition.sourceDevice?.id || null,
+        source_app_id: nutrition.sourceDevice?.id || undefined,
         metadata: {
           original_id: nutrition.id,
           meal_type: nutrition.mealType
@@ -435,7 +435,7 @@ export const mapToHealthData = (
         unit: 'ml',
         start_time: new Date(nutrition.date),
         source_provider: 'fitbit',
-        source_app_id: nutrition.sourceDevice?.id || null,
+        source_app_id: nutrition.sourceDevice?.id || undefined,
         metadata: {
           original_id: nutrition.id
         }

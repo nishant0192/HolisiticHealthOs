@@ -12,7 +12,7 @@ import {
 } from './types';
 
 const BASE_URL = 'https://wbsapi.withings.net/v2';
-const NOTIFY_URL = 'https://wbsapi.withings.net/notify';
+// const NOTIFY_URL = 'https://wbsapi.withings.net/notify';
 
 /**
  * Exchange authorization code for access token
@@ -238,7 +238,7 @@ export const getSleepData = async (
     if (response.data.body.series) {
       for (const sleep of response.data.body.series) {
         // For simplicity, we'll treat each night as a separate sleep session
-        const sleepSessions = {};
+        const sleepSessions: { [key: string]: any } = {};
         
         for (const stage of sleep) {
           const sessionDate = new Date(stage.startdate * 1000).toDateString();
@@ -294,9 +294,9 @@ export const getSleepData = async (
  * so this is a placeholder implementation
  */
 export const getNutritionData = async (
-  accessToken: string,
+  // accessToken: string,
   startDate: Date,
-  endDate: Date
+  // endDate: Date
 ): Promise<WithingsNutrition[]> => {
   try {
     // Use rate limiter

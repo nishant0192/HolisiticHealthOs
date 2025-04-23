@@ -1,5 +1,5 @@
-import axios from 'axios';
-import querystring from 'querystring';
+// import axios from 'axios';
+// import querystring from 'querystring';
 import { logger } from '../../middlewares/logging.middleware';
 import { rateLimiter } from '../../utils/rate-limiter';
 import { 
@@ -14,13 +14,13 @@ import {
 // This implementation is a placeholder until official documentation is available
 // Most Samsung Health data integration must be done through the mobile app SDK
 
-const BASE_URL = 'https://shealth.samsung.com/api';
+// const BASE_URL = 'https://shealth.samsung.com/api';
 
 /**
  * Exchange authorization code for access token
  * (Samsung Health typically uses OAuth 2.0)
  */
-export const getAccessToken = async (code: string): Promise<SamsungHealthToken> => {
+export const getAccessToken = async (_code: string): Promise<SamsungHealthToken> => {
   try {
     // Use rate limiter
     await rateLimiter.consume('samsung-health-api', 1);
@@ -43,7 +43,7 @@ export const getAccessToken = async (code: string): Promise<SamsungHealthToken> 
 /**
  * Refresh access token
  */
-export const refreshAccessToken = async (refreshToken: string): Promise<SamsungHealthToken> => {
+export const refreshAccessToken = async (_refreshToken: string): Promise<SamsungHealthToken> => {
   try {
     // Use rate limiter
     await rateLimiter.consume('samsung-health-api', 1);
@@ -66,7 +66,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<SamsungH
 /**
  * Get user profile
  */
-export const getUserProfile = async (accessToken: string): Promise<SamsungHealthProfile> => {
+export const getUserProfile = async (_accessToken: string): Promise<SamsungHealthProfile> => {
   try {
     // Use rate limiter
     await rateLimiter.consume('samsung-health-api', 1);
@@ -92,9 +92,9 @@ export const getUserProfile = async (accessToken: string): Promise<SamsungHealth
  * Get activities
  */
 export const getActivities = async (
-  accessToken: string,
+  _accessToken: string,
   startDate: Date,
-  endDate: Date
+  _endDate: Date
 ): Promise<SamsungHealthActivity[]> => {
   try {
     // Use rate limiter
@@ -131,9 +131,9 @@ export const getActivities = async (
  * Get sleep data
  */
 export const getSleepData = async (
-  accessToken: string,
+  // accessToken: string,
   startDate: Date,
-  endDate: Date
+  // endDate: Date
 ): Promise<SamsungHealthSleep[]> => {
   try {
     // Use rate limiter
@@ -186,9 +186,9 @@ export const getSleepData = async (
  * Get nutrition data
  */
 export const getNutritionData = async (
-  accessToken: string,
+  _accessToken: string,
   startDate: Date,
-  endDate: Date
+  _endDate: Date
 ): Promise<SamsungHealthNutrition[]> => {
   try {
     // Use rate limiter

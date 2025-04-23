@@ -10,11 +10,11 @@ export const validate = (schema: Joi.ObjectSchema) => {
     });
     
     if (error) {
-      const validationErrors = error.details.reduce((acc: Record<string, string>, curr) => {
-        const key = curr.path.join('.');
-        acc[key] = curr.message;
-        return acc;
-      }, {});
+      // const validationErrors = error.details.reduce((acc: Record<string, string>, curr) => {
+      //   const key = curr.path.join('.');
+      //   acc[key] = curr.message;
+      //   return acc;
+      // }, {});
       
       throw new ApiError('Validation failed', 400);
     }
