@@ -21,7 +21,7 @@ if (!process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_HOST || 
 }
 
 const databaseConfig: DatabaseConfig = {
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'postgres',
   port: parseInt(process.env.DB_PORT || '5432', 10),
   database: process.env.DB_NAME || 'holistic_health_os',
   user: process.env.DB_USER || 'postgres',

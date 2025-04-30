@@ -79,6 +79,29 @@ services:
     networks:
       - app-net
 
+  # Analytics Service
+  # Analytics Service - Special approach for shared modules
+    # Analytics Service
+  analytics-service:
+    build:
+      context: ./services/analytics-service
+      dockerfile: Dockerfile.dev
+    container_name: analytics-service
+    volumes:
+      - ./services/analytics-service:/app
+      - /app/node_modules
+      - ./tsconfig.json:/tsconfig.json
+      - ./shared:/shared
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./services/analytics-service/.env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+
   # API Gateway
   api-gateway:
     build:
@@ -96,6 +119,7 @@ services:
       - auth-service
       - user-service
       - integration-service
+      - analytics-service
     networks:
       - app-net
 

@@ -1,20 +1,23 @@
 {
-    "files": [],
-    "references": [
-      { "path": "shared/common" },
-      { "path": "shared/logger" },
-      { "path": "shared/monitoring" },
-      { "path": "services/auth-service" },
-      { "path": "services/user-service" },
-      { "path": "services/integration-service" },
-      { "path": "services/api-gateway" }
-    ],
-    "compilerOptions": {
-      "composite": true,
-      "baseUrl": ".",
-      "paths": {
-        "@shared/*": ["shared/*/src"]
-      }
+  "files": [],
+  "references": [
+    { "path": "shared/common" },
+    { "path": "shared/logger" },
+    { "path": "shared/monitoring" },
+    { "path": "services/auth-service" },
+    { "path": "services/user-service" },
+    { "path": "services/integration-service" },
+    { "path": "services/analytics-service" },
+    { "path": "services/api-gateway" }
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*/src"]
     }
   }
-  
+}

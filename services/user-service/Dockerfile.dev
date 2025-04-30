@@ -1,17 +1,19 @@
-# Development Dockerfile for User Service
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and tsconfig.json first
 COPY package*.json ./
-RUN npm install
+COPY tsconfig.json ./
+
+# Install dependencies without running scripts
+RUN npm install --ignore-scripts
 
 # Copy source code
 COPY . .
 
 # Expose port
-EXPOSE 3002
+EXPOSE 3000
 
 # Command to run in development mode
 CMD ["npm", "run", "dev"]

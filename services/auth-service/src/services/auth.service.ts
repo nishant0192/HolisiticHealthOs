@@ -1,5 +1,5 @@
 import { UserModel, User, CreateUserParams } from '../models/user.model';
-import { compareSync } from 'bcrypt';
+import { compareSync } from 'bcryptjs';
 import { encryptPassword } from '../utils/encryption';
 
 export class AuthService {

@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { authConfig } from '../config';
 
 export const encryptPassword = async (password: string): Promise<string> => {

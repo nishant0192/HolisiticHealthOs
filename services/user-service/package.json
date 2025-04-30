@@ -10,8 +10,7 @@
         "clean": "rimraf dist",
         "lint": "eslint src/**/*.ts",
         "lint:fix": "eslint src/**/*.ts --fix",
-        "format": "prettier --write \"src/**/*.ts\"",
-        "prepare": "npm run build"
+        "format": "prettier --write \"src/**/*.ts\""
     },
     "keywords": [
         "user",

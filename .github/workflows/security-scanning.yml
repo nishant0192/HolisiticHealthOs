@@ -1,0 +1,70 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays at midnight
+
+jobs:
+  npm-dependency-scanning:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api-gateway, auth-service, user-service, integration-service, analytics-service, ai-service, notification-service, queue-service]
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Run npm audit
+        run: |
+          cd services/${{ matrix.service }}
+          npm audit --production --audit-level=high
+        continue-on-error: true
+  
+  code-scanning:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+  
+  docker-image-scanning:
+    needs: [npm-dependency-scanning, code-scanning]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        service: [api-gateway, auth-service, user-service, integration-service]
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build image for scanning
+        run: |
+          docker build -t temp-image-${{ matrix.service }} -f services/${{ matrix.service }}/Dockerfile .
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'temp-image-${{ matrix.service }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'

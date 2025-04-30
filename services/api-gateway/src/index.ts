@@ -50,7 +50,7 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start the server
-const PORT = appConfig.port;
+const PORT = 8080;
 app.listen(PORT, () => {
     console.log(`API Gateway running on port ${PORT} in ${appConfig.env} mode`);
 });

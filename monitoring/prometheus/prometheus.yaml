@@ -31,6 +31,12 @@ scrape_configs:
     static_configs:
       - targets: ['integration-service:3003']
 
+  - job_name: 'analytics-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['analytics-service:3004']
+
+
   - job_name: 'api-gateway'
     metrics_path: '/metrics'
     static_configs:

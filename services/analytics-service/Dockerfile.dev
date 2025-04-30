@@ -1,0 +1,14 @@
+FROM node:18-alpine
+WORKDIR /app
+
+# Copy only package files, install deps
+COPY package*.json ./
+RUN npm install
+
+# Copy your service code (including its own tsconfig.json)
+COPY . .
+
+EXPOSE 3004
+
+# Preload tsconfig-paths AND dotenv/config
+CMD ["npx","ts-node-dev","--respawn", "--transpile-only","--require","tsconfig-paths/register","src/index.ts"]

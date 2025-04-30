@@ -1,10 +1,12 @@
-# Development Dockerfile for Auth Service
-FROM node:18-alpine
+FROM node:18
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package files
 COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
 RUN npm install
 
 # Copy source code
@@ -14,4 +16,4 @@ COPY . .
 EXPOSE 3001
 
 # Command to run in development mode
-CMD ["npm", "run", "dev"]
+CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/index.ts"]
