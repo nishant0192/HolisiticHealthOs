@@ -25,6 +25,9 @@ app.use(cors({
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
+// Add this before setting up routes
+app.set('trust proxy', 1);
+
 // Apply rate limiting
 const limiter = rateLimit({
   windowMs: appConfig.rateLimitWindowMs,
