@@ -95,7 +95,7 @@ router.post('/login', authLimiter, asyncHandler(proxyToService('auth', '/auth/lo
  *       400:
  *         description: Invalid or expired token
  */
-router.get('/verify/:token', asyncHandler(proxyToService('auth', '/auth/verify')));
+router.get('/verify/:token', asyncHandler(proxyToService('auth', '/auth/verify/:token')));
 
 /**
  * @swagger

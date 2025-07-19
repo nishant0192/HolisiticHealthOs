@@ -1,5 +1,3 @@
-mkdir -p tools/database/migrations
-cat > tools/database/migrations/004_create_user_health_profiles.sql << 'EOL'
 -- Migration: Create user_health_profiles table
 -- Description: Creates the health profiles table for storing user health-related data
 
@@ -42,4 +40,3 @@ $$;
 
 -- Insert a comment to document the table
 COMMENT ON TABLE user_health_profiles IS 'Stores health-related information for users such as health conditions, preferences, and metrics';
-EOL

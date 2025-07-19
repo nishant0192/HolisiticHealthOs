@@ -60,7 +60,7 @@ router.get('/profile',
  */
 router.put('/profile', 
   validateToken, 
-  asyncHandler(proxyToService('user', '/users/profile'))
+  asyncHandler(proxyToService('user', '/profile'))
 );
 
 /**
@@ -79,7 +79,7 @@ router.put('/profile',
  */
 router.get('/health-profile',
   validateToken,
-  asyncHandler(proxyToService('user', '/users/health-profile'))
+  asyncHandler(proxyToService('user', '/health-profile'))
 );
 
 /**
@@ -129,7 +129,7 @@ router.get('/health-profile',
  */
 router.put('/health-profile',
   validateToken,
-  asyncHandler(proxyToService('user', '/users/health-profile'))
+  asyncHandler(proxyToService('user', '/health-profile'))
 );
 
 export default router;

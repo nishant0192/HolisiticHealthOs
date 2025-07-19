@@ -34,7 +34,7 @@ services:
     ports:
       - "3001:3001"
     env_file:
-      - ./services/auth-service/.env.development
+      - ./services/auth-service/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,7 +53,7 @@ services:
     ports:
       - "3002:3002"
     env_file:
-      - ./services/user-service/.env.development
+      - ./services/user-service/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,7 +72,7 @@ services:
     ports:
       - "3003:3003"
     env_file:
-      - ./services/integration-service/.env.development
+      - ./services/integration-service/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -95,7 +95,7 @@ services:
     ports:
       - "3004:3004"
     env_file:
-      - ./services/analytics-service/.env.development
+      - ./services/analytics-service/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -114,7 +114,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - ./services/api-gateway/.env.development
+      - ./services/api-gateway/.env
     depends_on:
       - auth-service
       - user-service
